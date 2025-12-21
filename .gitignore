@@ -58,3 +58,8 @@ Thumbs.db
 htmlcov/
 .tox/
 .pytest_cache/
+
+# Ignore plant disease dataset
+model_train/plant_disease_dataset/train
+model_train/plant_disease_dataset/valid
+model_train/__pycache__/
