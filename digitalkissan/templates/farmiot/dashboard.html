@@ -1,0 +1,2816 @@
+{% extends "base.html" %}
+
+{% block title %}Farm Monitoring Dashboard - Digital Kisan{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Advanced Dashboard Styles */
+.dashboard-header {
+  background: linear-gradient(135deg, var(--farmer-50) 0%, #ffffff 50%, var(--farmer-100) 100%);
+  border-bottom: 1px solid var(--farmer-200);
+  padding: 32px 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.header-gradient {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 20% 80%, rgba(34, 197, 94, 0.1) 0%, transparent 50%),
+              radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.05) 0%, transparent 50%);
+}
+
+.header-content {
+  position: relative;
+  text-align: center;
+  z-index: 1;
+}
+
+.header-icon {
+  width: 72px;
+  height: 72px;
+  background: linear-gradient(135deg, var(--farmer-500), var(--farmer-600));
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  color: white;
+  box-shadow: 0 10px 25px -5px rgba(34, 197, 94, 0.3);
+}
+
+.header-content h1 {
+  font-size: 40px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #111827 0%, var(--farmer-700) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 12px;
+}
+
+.header-content p {
+  font-size: 18px;
+  color: #4b5563;
+  max-width: 700px;
+  margin: 0 auto 24px;
+}
+
+.dashboard-filters {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.filter-btn {
+  padding: 8px 20px;
+  background: white;
+  border: 1px solid var(--farmer-300);
+  border-radius: 8px;
+  color: #4b5563;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.filter-btn.active,
+.filter-btn:hover {
+  background: var(--farmer-600);
+  color: white;
+  border-color: var(--farmer-600);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.2);
+}
+
+/* Dashboard Layout */
+.dashboard-main {
+  background: linear-gradient(180deg, #f9fafb 0%, #f0fdf4 100%);
+  min-height: calc(100vh - 180px);
+  padding: 32px 0;
+}
+
+.dashboard-container {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 24px;
+}
+
+/* Main Dashboard Grid */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  grid-template-rows: auto;
+  gap: 24px;
+}
+
+/* KPI Cards */
+.kpi-card {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--farmer-200);
+  transition: all 0.3s ease;
+}
+
+.kpi-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.kpi-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.kpi-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.kpi-icon {
+  width: 40px;
+  height: 40px;
+  background: var(--farmer-100);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--farmer-600);
+}
+
+.kpi-value {
+  font-size: 32px;
+  font-weight: 800;
+  color: #111827;
+  margin-bottom: 8px;
+}
+
+.kpi-change {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.kpi-change.positive {
+  color: #059669;
+}
+
+.kpi-change.negative {
+  color: #dc2626;
+}
+
+.kpi-change.neutral {
+  color: #6b7280;
+}
+
+/* Large Chart Cards */
+.chart-card {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--farmer-200);
+  grid-column: span 6;
+}
+
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.chart-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.chart-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* Weather Widget */
+.weather-widget {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 16px;
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+  grid-column: span 4;
+}
+
+.weather-widget::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+              radial-gradient(circle at 70% 80%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+}
+
+.weather-current {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.weather-temp {
+  font-size: 56px;
+  font-weight: 800;
+}
+
+.weather-details {
+  text-align: right;
+}
+
+.weather-location {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.weather-condition {
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+.weather-forecast {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.forecast-day {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 10px;
+  padding: 12px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.forecast-day:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+.forecast-day-name {
+  font-size: 12px;
+  opacity: 0.9;
+  margin-bottom: 8px;
+}
+
+.forecast-day-temp {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+/* Soil Health Card */
+.soil-health-card {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: white;
+  border-radius: 16px;
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+  grid-column: span 4;
+}
+
+.soil-health-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+}
+
+.soil-metrics {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.soil-metric {
+  text-align: center;
+}
+
+.metric-value {
+  font-size: 24px;
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+
+.metric-label {
+  font-size: 12px;
+  opacity: 0.9;
+}
+
+/* Crop Health Grid */
+.crop-health-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.crop-health-item {
+  background: var(--farmer-50);
+  border-radius: 10px;
+  padding: 16px;
+  text-align: center;
+  border: 1px solid var(--farmer-200);
+  transition: all 0.3s ease;
+}
+
+.crop-health-item:hover {
+  background: var(--farmer-100);
+  transform: translateY(-2px);
+}
+
+.crop-health-percent {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--farmer-700);
+  margin-bottom: 4px;
+}
+
+.crop-health-label {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+/* Alert Card */
+.alert-card {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border: 1px solid #fbbf24;
+  border-radius: 16px;
+  padding: 20px;
+  grid-column: span 12;
+}
+
+.alert-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.alert-icon {
+  width: 40px;
+  height: 40px;
+  background: #f59e0b;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.alert-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #92400e;
+}
+
+.alert-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.alert-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.alert-item:last-child {
+  border-bottom: none;
+}
+
+.alert-item.severe {
+  color: #dc2626;
+}
+
+.alert-item.warning {
+  color: #d97706;
+}
+
+.alert-item.info {
+  color: #2563eb;
+}
+
+/* Sidebar */
+.dashboard-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Field Map Card */
+.field-map-card {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--farmer-200);
+}
+
+.field-map {
+  width: 100%;
+  height: 200px;
+  background: linear-gradient(135deg, var(--farmer-100), var(--farmer-200));
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--farmer-600);
+  margin-bottom: 16px;
+}
+
+.field-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+/* Quick Actions */
+.quick-actions-card {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--farmer-200);
+}
+
+.quick-actions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--farmer-50);
+  border: 1px solid var(--farmer-200);
+  border-radius: 10px;
+  color: #4b5563;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.action-btn:hover {
+  background: var(--farmer-100);
+  color: var(--farmer-700);
+  transform: translateX(4px);
+}
+
+.action-icon {
+  width: 32px;
+  height: 32px;
+  background: var(--farmer-100);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--farmer-600);
+}
+
+/* Chart Styles */
+.chart-container {
+  position: relative;
+  height: 300px;
+  width: 100%;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .dashboard-container {
+    grid-template-columns: 1fr;
+  }
+  
+  .chart-card,
+  .weather-widget,
+  .soil-health-card {
+    grid-column: span 12;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .chart-card,
+  .weather-widget,
+  .soil-health-card {
+    grid-column: span 1;
+  }
+  
+  .soil-metrics,
+  .weather-forecast,
+  .crop-health-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Loading Animation */
+.loading-chart {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--farmer-200);
+  border-top-color: var(--farmer-600);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Tooltip Styles */
+.tooltip {
+  position: absolute;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  pointer-events: none;
+  z-index: 1000;
+}
+
+/* Chart Legends */
+.chart-legend {
+  display: flex;
+  gap: 16px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.legend-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+}
+
+/* Status Indicators */
+.status-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.status-good {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.status-warning {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.status-critical {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+/* Progress Bars */
+.progress-bar {
+  height: 8px;
+  background: var(--farmer-200);
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 8px 0;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.progress-good {
+  background: var(--farmer-500);
+}
+
+.progress-warning {
+  background: #f59e0b;
+}
+
+.progress-critical {
+  background: #ef4444;
+}
+
+/* Data Table */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 16px;
+}
+
+.data-table th {
+  background: var(--farmer-50);
+  padding: 12px;
+  text-align: left;
+  font-weight: 600;
+  color: #4b5563;
+  border-bottom: 1px solid var(--farmer-200);
+}
+
+.data-table td {
+  padding: 12px;
+  border-bottom: 1px solid var(--farmer-200);
+}
+
+.data-table tr:hover {
+  background: var(--farmer-50);
+}
+
+/* Metric Cards */
+.metric-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.metric-card {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid var(--farmer-200);
+}
+
+.metric-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.metric-card-title {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.metric-card-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.metric-card-trend {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+}
+/* Reset and Base Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family:
+    "Inter",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
+  line-height: 1.6;
+  color: #111827;
+  background-color: #ffffff;
+}
+
+/* Farmer Theme Colors */
+:root {
+  --farmer-50: #f0fdf4;
+  --farmer-100: #dcfce7;
+  --farmer-200: #bbf7d0;
+  --farmer-300: #86efac;
+  --farmer-400: #4ade80;
+  --farmer-500: #22c55e;
+  --farmer-600: #16a34a;
+  --farmer-700: #15803d;
+  --farmer-800: #166534;
+  --farmer-900: #14532d;
+  --farmer-950: #052e16;
+}
+
+/* Utilities */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.text-farmer-600 {
+  color: var(--farmer-600);
+}
+
+/* Button Styles */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-primary {
+  background-color: var(--farmer-600);
+  color: white;
+  border-color: var(--farmer-600);
+}
+
+.btn-primary:hover {
+  background-color: var(--farmer-700);
+  border-color: var(--farmer-700);
+}
+
+.btn-ghost {
+  background-color: transparent;
+  color: var(--farmer-700);
+}
+
+.btn-ghost:hover {
+  background-color: var(--farmer-50);
+  color: var(--farmer-800);
+}
+
+.btn-outline {
+  background-color: transparent;
+  color: var(--farmer-700);
+  border-color: var(--farmer-600);
+}
+
+.btn-outline:hover {
+  background-color: var(--farmer-50);
+}
+
+.btn-outline-white {
+  background-color: transparent;
+  color: white;
+  border-color: white;
+}
+
+.btn-outline-white:hover {
+  background-color: white;
+  color: var(--farmer-600);
+}
+
+.btn-white {
+  background-color: white;
+  color: var(--farmer-600);
+}
+
+.btn-white:hover {
+  background-color: var(--farmer-50);
+}
+
+.btn-large {
+  padding: 16px 32px;
+  font-size: 18px;
+}
+
+.btn-full {
+  width: 100%;
+}
+
+/* Navigation */
+.navigation {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  z-index: 50;
+  background-color: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--farmer-200);
+}
+
+.nav-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+.nav-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  gap: 8px;
+}
+
+.logo-icon {
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, var(--farmer-500), var(--farmer-600));
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.logo-text {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--farmer-800);
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  color: #4b5563;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.15s ease;
+}
+
+.nav-link:hover {
+  background-color: var(--farmer-50);
+  color: var(--farmer-700);
+}
+
+.nav-link.active {
+  background-color: var(--farmer-50);
+  color: var(--farmer-700);
+}
+
+.auth-buttons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mobile-menu-btn {
+  display: none;
+  background: none;
+  border: none;
+  padding: 8px;
+  color: #4b5563;
+  cursor: pointer;
+}
+
+.mobile-nav {
+  border-top: 1px solid var(--farmer-200);
+  padding: 16px 0;
+}
+
+.mobile-nav-links {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mobile-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 8px;
+  color: #4b5563;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.mobile-nav-link.active {
+  background-color: var(--farmer-50);
+  color: var(--farmer-700);
+}
+
+.mobile-auth-buttons {
+  padding-top: 16px;
+  border-top: 1px solid var(--farmer-200);
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Hero Section */
+.hero {
+  position: relative;
+  background: linear-gradient(
+    135deg,
+    var(--farmer-50) 0%,
+    #ffffff 50%,
+    var(--farmer-100) 100%
+  );
+  padding: 80px 0 128px;
+  overflow: hidden;
+}
+
+.hero-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2316a34a' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  opacity: 0.4;
+}
+
+.hero-content {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 48px;
+  align-items: center;
+}
+
+.hero-text {
+  text-align: center;
+}
+
+.hero-title {
+  font-size: 48px;
+  font-weight: 700;
+  line-height: 1.1;
+  margin-bottom: 24px;
+  color: #111827;
+}
+
+.hero-description {
+  font-size: 20px;
+  color: #4b5563;
+  margin-bottom: 32px;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.hero-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 48px;
+  align-items: center;
+}
+
+.hero-features {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  text-align: center;
+}
+
+.feature-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.feature-icon {
+  width: 48px;
+  height: 48px;
+  background-color: var(--farmer-100);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+  color: var(--farmer-600);
+}
+
+.feature-item h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 4px;
+}
+
+.feature-item p {
+  font-size: 14px;
+  color: #4b5563;
+}
+
+.hero-image {
+  position: relative;
+}
+
+.hero-illustration {
+  position: relative;
+  height: 400px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, var(--farmer-400), var(--farmer-600));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.illustration-content {
+  text-align: center;
+}
+
+.illustration-icon {
+  width: 128px;
+  height: 128px;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 24px;
+}
+
+.illustration-content h3 {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.illustration-content p {
+  color: var(--farmer-100);
+}
+
+.floating-element {
+  position: absolute;
+  font-size: 24px;
+  background-color: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(4px);
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: float 6s ease-in-out infinite;
+}
+
+.floating-1 {
+  top: 24px;
+  left: 24px;
+  animation-delay: 0.1s;
+}
+
+.floating-2 {
+  top: 80px;
+  right: 32px;
+  animation-delay: 1s;
+}
+
+.floating-3 {
+  bottom: 90px;
+  left: 32px;
+  animation-delay: 1.67s;
+}
+
+.floating-4 {
+  bottom: 32px;
+  right: 64px;
+  animation-delay: 2s;
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-28px);
+  }
+}
+
+/* Features Section */
+.features-section {
+  padding: 96px 0;
+  background-color: white;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 64px;
+}
+
+.section-header h2 {
+  font-size: 36px;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 16px;
+}
+
+.section-header p {
+  font-size: 18px;
+  color: #4b5563;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 32px;
+}
+
+.feature-card {
+  background-color: white;
+  border: 1px solid var(--farmer-200);
+  border-radius: 12px;
+  padding: 24px;
+  text-align: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.feature-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  border-color: var(--farmer-400);
+}
+
+.feature-card-header {
+  margin-bottom: 24px;
+}
+
+.feature-card-icon {
+  width: 64px;
+  height: 64px;
+  background-color: var(--farmer-100);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+  color: var(--farmer-600);
+  transition: background-color 0.3s ease;
+}
+
+.feature-card:hover .feature-card-icon {
+  background-color: var(--farmer-200);
+}
+
+.feature-card h3 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.feature-card-content p {
+  color: #4b5563;
+  margin-bottom: 24px;
+}
+
+/* Stats Section */
+.stats-section {
+  padding: 64px 0;
+  background-color: var(--farmer-50);
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 24px;
+}
+
+.stat-item {
+  text-align: center;
+}
+
+.stat-icon {
+  width: 48px;
+  height: 48px;
+  background-color: var(--farmer-200);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 12px;
+  color: var(--farmer-700);
+}
+
+.stat-value {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--farmer-800);
+  margin-bottom: 4px;
+}
+
+.stat-label {
+  font-size: 14px;
+  color: #4b5563;
+}
+
+/* Testimonials Section */
+.testimonials-section {
+  padding: 96px 0;
+  background-color: white;
+}
+
+.testimonials-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 32px;
+}
+
+.testimonial-card {
+  background-color: white;
+  border: 1px solid var(--farmer-200);
+  border-radius: 12px;
+  padding: 24px;
+}
+
+.testimonial-rating {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 16px;
+  color: #fbbf24;
+}
+
+.testimonial-content {
+  font-style: italic;
+  color: #374151;
+  margin-bottom: 24px;
+  line-height: 1.6;
+}
+
+.testimonial-author {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.author-avatar {
+  width: 40px;
+  height: 40px;
+  background-color: var(--farmer-600);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+}
+
+.author-name {
+  font-weight: 600;
+  color: #111827;
+}
+
+.author-role {
+  font-size: 14px;
+  color: #4b5563;
+}
+
+/* CTA Section */
+.cta-section {
+  padding: 64px 0;
+  background-color: var(--farmer-600);
+}
+
+.cta-content {
+  text-align: center;
+  color: white;
+}
+
+.cta-content h2 {
+  font-size: 36px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.cta-content p {
+  font-size: 20px;
+  color: var(--farmer-100);
+  margin-bottom: 32px;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.cta-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center;
+}
+
+/* Footer */
+.footer {
+  background-color: #111827;
+  color: white;
+  padding: 48px 0;
+}
+
+.footer-content {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 32px;
+  margin-bottom: 32px;
+}
+
+.footer-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.footer-logo .logo-icon {
+  background-color: var(--farmer-600);
+}
+
+.footer-logo-text {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.footer-description {
+  color: #9ca3af;
+}
+
+.footer-section h3 {
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.footer-links {
+  list-style: none;
+}
+
+.footer-links li {
+  margin-bottom: 8px;
+}
+
+.footer-links a {
+  color: #9ca3af;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.footer-links a:hover {
+  color: white;
+}
+
+.footer-bottom {
+  border-top: 1px solid #374151;
+  padding-top: 32px;
+  text-align: center;
+  color: #9ca3af;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .hero-content {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-title {
+    font-size: 40px;
+  }
+
+  .nav-links,
+  .auth-buttons {
+    display: none;
+  }
+
+  .mobile-menu-btn {
+    display: block;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: 32px;
+  }
+
+  .hero-description {
+    font-size: 18px;
+  }
+
+  .hero-buttons {
+    flex-direction: column;
+  }
+
+  .hero-features {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  .cta-buttons {
+    flex-direction: column;
+  }
+
+  .section-header h2 {
+    font-size: 28px;
+  }
+
+  .cta-content h2 {
+    font-size: 28px;
+  }
+}
+
+@media (min-width: 640px) {
+  .hero-buttons {
+    flex-direction: row;
+    justify-content: center;
+  }
+
+  .cta-buttons {
+    flex-direction: row;
+    justify-content: center;
+  }
+}
+
+@media (min-width: 1024px) {
+  .hero-content {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .hero-text {
+    text-align: left;
+  }
+
+  .hero-buttons {
+    justify-content: flex-start;
+  }
+
+  .hero-features {
+    text-align: left;
+  }
+
+  .feature-item {
+    align-items: flex-start;
+  }
+}
+
+/* Card Styles */
+.card {
+  background-color: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+  padding: 24px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.card-content {
+  padding: 24px;
+}
+
+.card-footer {
+  padding: 24px;
+  border-top: 1px solid #e5e7eb;
+  background-color: #f9fafb;
+}
+
+/* Badge Styles */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  background-color: var(--farmer-100);
+  color: var(--farmer-800);
+}
+
+.badge-success {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+.badge-warning {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.badge-error {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+/* Form Styles */
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 8px;
+}
+
+.form-input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 16px;
+  transition: border-color 0.15s ease;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--farmer-500);
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+}
+
+.form-input.error {
+  border-color: #ef4444;
+}
+
+.form-error {
+  color: #ef4444;
+  font-size: 14px;
+  margin-top: 4px;
+}
+
+/* Loading Styles */
+.loading {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #e5e7eb;
+  border-radius: 50%;
+  border-top-color: var(--farmer-600);
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Alert Styles */
+.alert {
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.alert-info {
+  background-color: #dbeafe;
+  border: 1px solid #bfdbfe;
+  color: #1e40af;
+}
+
+.alert-success {
+  background-color: #dcfce7;
+  border: 1px solid #bbf7d0;
+  color: #166534;
+}
+
+.alert-warning {
+  background-color: #fef3c7;
+  border: 1px solid #fde68a;
+  color: #92400e;
+}
+
+.alert-error {
+  background-color: #fee2e2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Advanced Dashboard Header -->
+<header class="dashboard-header">
+  <div class="header-gradient"></div>
+  <div class="container">
+    <div class="header-content">
+      <div class="header-icon">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+        </svg>
+      </div>
+      <h1>Farm Monitoring Dashboard</h1>
+      <p>Real-time analytics, climate predictions, and field insights for smart farming decisions</p>
+      
+      <div class="dashboard-filters">
+        <button class="filter-btn active" data-period="today">Today</button>
+        <button class="filter-btn" data-period="week">This Week</button>
+        <button class="filter-btn" data-period="month">This Month</button>
+        <button class="filter-btn" data-period="season">This Season</button>
+        <select class="filter-btn" style="appearance: none; padding-right: 40px;">
+          <option>Select Field</option>
+          <option>North Field</option>
+          <option>South Field</option>
+          <option>East Field</option>
+          <option>West Field</option>
+        </select>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="dashboard-main">
+  <div class="container">
+    <div class="dashboard-container">
+      <!-- Main Dashboard Grid -->
+      <div class="dashboard-grid">
+        <!-- KPI Cards -->
+        <div class="kpi-card" style="grid-column: span 3;">
+          <div class="kpi-header">
+            <div class="kpi-title">Soil Moisture</div>
+            <div class="kpi-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
+              </svg>
+            </div>
+          </div>
+          <div class="kpi-value">68%</div>
+          <div class="kpi-change positive">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="18 15 12 9 6 15"/>
+            </svg>
+            +2% from yesterday
+          </div>
+        </div>
+
+        <div class="kpi-card" style="grid-column: span 3;">
+          <div class="kpi-header">
+            <div class="kpi-title">Crop Health</div>
+            <div class="kpi-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                <polyline points="22 4 12 14.01 9 11.01"/>
+              </svg>
+            </div>
+          </div>
+          <div class="kpi-value">92%</div>
+          <div class="kpi-change positive">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="18 15 12 9 6 15"/>
+            </svg>
+            +5% this week
+          </div>
+        </div>
+
+        <div class="kpi-card" style="grid-column: span 3;">
+          <div class="kpi-header">
+            <div class="kpi-title">Yield Prediction</div>
+            <div class="kpi-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/>
+                <circle cx="12" cy="10" r="3"/>
+              </svg>
+            </div>
+          </div>
+          <div class="kpi-value">8.2T/ha</div>
+          <div class="kpi-change positive">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="18 15 12 9 6 15"/>
+            </svg>
+            +12% vs target
+          </div>
+        </div>
+
+        <div class="kpi-card" style="grid-column: span 3;">
+          <div class="kpi-header">
+            <div class="kpi-title">Water Usage</div>
+            <div class="kpi-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
+            </div>
+          </div>
+          <div class="kpi-value">4,250L</div>
+          <div class="kpi-change negative">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+            -15% efficiency
+          </div>
+        </div>
+
+        <!-- Weather Widget -->
+        <div class="weather-widget">
+          <div class="weather-current">
+            <div>
+              <div class="weather-temp">24°C</div>
+              <div class="weather-condition">Partly Cloudy</div>
+            </div>
+            <div class="weather-details">
+              <div class="weather-location">North Field</div>
+              <div>Humidity: 65%</div>
+              <div>Wind: 12 km/h</div>
+            </div>
+          </div>
+          <div class="weather-forecast">
+            <div class="forecast-day">
+              <div class="forecast-day-name">Mon</div>
+              <div class="forecast-day-temp">26°</div>
+            </div>
+            <div class="forecast-day">
+              <div class="forecast-day-name">Tue</div>
+              <div class="forecast-day-temp">28°</div>
+            </div>
+            <div class="forecast-day">
+              <div class="forecast-day-name">Wed</div>
+              <div class="forecast-day-temp">25°</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Soil Health Card -->
+        <div class="soil-health-card">
+          <div class="chart-header">
+            <div class="chart-title" style="color: white;">Soil Health Analysis</div>
+          </div>
+          <div class="soil-metrics">
+            <div class="soil-metric">
+              <div class="metric-value">6.8</div>
+              <div class="metric-label">pH Level</div>
+            </div>
+            <div class="soil-metric">
+              <div class="metric-value">2.4%</div>
+              <div class="metric-label">Organic Matter</div>
+            </div>
+            <div class="soil-metric">
+              <div class="metric-value">142 ppm</div>
+              <div class="metric-label">Nitrogen</div>
+            </div>
+            <div class="soil-metric">
+              <div class="metric-value">45 ppm</div>
+              <div class="metric-label">Phosphorus</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Crop Health Distribution -->
+        <div class="chart-card" style="grid-column: span 8;">
+          <div class="chart-header">
+            <div class="chart-title">Crop Health Distribution</div>
+            <div class="chart-actions">
+              <button class="filter-btn">Weekly</button>
+              <button class="filter-btn active">Monthly</button>
+            </div>
+          </div>
+          <div class="chart-container">
+            <canvas id="cropHealthChart"></canvas>
+          </div>
+          <div class="chart-legend">
+            <div class="legend-item">
+              <div class="legend-color" style="background: var(--farmer-500);"></div>
+              <span>Excellent (90-100%)</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color" style="background: var(--farmer-400);"></div>
+              <span>Good (70-89%)</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color" style="background: var(--farmer-300);"></div>
+              <span>Fair (50-69%)</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color" style="background: #f59e0b;"></div>
+              <span>Needs Attention (<50%)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Temperature Trend -->
+        <div class="chart-card" style="grid-column: span 4;">
+          <div class="chart-header">
+            <div class="chart-title">Temperature Trend</div>
+          </div>
+          <div class="chart-container">
+            <canvas id="temperatureChart"></canvas>
+          </div>
+          <div class="metric-cards">
+            <div class="metric-card">
+              <div class="metric-card-header">
+                <div class="metric-card-title">Avg Temp</div>
+                <span class="status-indicator status-good">Optimal</span>
+              </div>
+              <div class="metric-card-value">24.5°C</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-card-header">
+                <div class="metric-card-title">Max Temp</div>
+                <span class="status-indicator status-warning">High</span>
+              </div>
+              <div class="metric-card-value">32°C</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Rainfall Prediction -->
+        <div class="chart-card" style="grid-column: span 6;">
+          <div class="chart-header">
+            <div class="chart-title">Rainfall Prediction (Next 7 Days)</div>
+          </div>
+          <div class="chart-container">
+            <canvas id="rainfallChart"></canvas>
+          </div>
+          <div class="data-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Day</th>
+                  <th>Rainfall (mm)</th>
+                  <th>Probability</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Today</td>
+                  <td>2.4</td>
+                  <td>40%</td>
+                  <td><span class="status-indicator status-good">Light</span></td>
+                </tr>
+                <tr>
+                  <td>Tomorrow</td>
+                  <td>8.7</td>
+                  <td>75%</td>
+                  <td><span class="status-indicator status-warning">Moderate</span></td>
+                </tr>
+                <tr>
+                  <td>Day 3</td>
+                  <td>15.2</td>
+                  <td>90%</td>
+                  <td><span class="status-indicator status-critical">Heavy</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Growth Progress -->
+        <div class="chart-card" style="grid-column: span 6;">
+          <div class="chart-header">
+            <div class="chart-title">Crop Growth Progress</div>
+          </div>
+          <div class="chart-container">
+            <canvas id="growthChart"></canvas>
+          </div>
+          <div class="crop-health-grid">
+            <div class="crop-health-item">
+              <div class="crop-health-percent">78%</div>
+              <div class="crop-health-label">Germination</div>
+              <div class="progress-bar">
+                <div class="progress-fill progress-good" style="width: 78%;"></div>
+              </div>
+            </div>
+            <div class="crop-health-item">
+              <div class="crop-health-percent">92%</div>
+              <div class="crop-health-label">Vegetative</div>
+              <div class="progress-bar">
+                <div class="progress-fill progress-good" style="width: 92%;"></div>
+              </div>
+            </div>
+            <div class="crop-health-item">
+              <div class="crop-health-percent">65%</div>
+              <div class="crop-health-label">Flowering</div>
+              <div class="progress-bar">
+                <div class="progress-fill progress-warning" style="width: 65%;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Alerts Card -->
+        <div class="alert-card">
+          <div class="alert-header">
+            <div class="alert-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                <line x1="12" y1="9" x2="12" y2="13"/>
+                <line x1="12" y1="17" x2="12.01" y2="17"/>
+              </svg>
+            </div>
+            <div class="alert-title">Active Alerts & Recommendations</div>
+          </div>
+          <ul class="alert-list">
+            <li class="alert-item warning">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="8" x2="12" y2="12"/>
+                <line x1="12" y1="16" x2="12.01" y2="16"/>
+              </svg>
+              <span>Irrigation required in South Field - Soil moisture at 42%</span>
+            </li>
+            <li class="alert-item info">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="16" x2="12" y2="12"/>
+                <line x1="12" y1="8" x2="12.01" y2="8"/>
+              </svg>
+              <span>Optimal time for fertilizer application - Weather window: Next 48 hours</span>
+            </li>
+            <li class="alert-item severe">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                <line x1="12" y1="9" x2="12" y2="13"/>
+                <line x1="12" y1="17" x2="12.01" y2="17"/>
+              </svg>
+              <span>Heavy rainfall predicted (90% probability) in 3 days - Prepare drainage</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <aside class="dashboard-sidebar">
+        <!-- Field Map -->
+        <div class="field-map-card">
+          <div class="chart-header">
+            <div class="chart-title">Field Map</div>
+          </div>
+          <div class="field-map">
+            <svg width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+              <path d="M3 9h18"/>
+              <path d="M9 21V9"/>
+            </svg>
+          </div>
+          <div class="field-stats">
+            <div class="stat-item">
+              <div class="stat-value">4.2 ha</div>
+              <div class="stat-label">Total Area</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value">85%</div>
+              <div class="stat-label">Utilization</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions-card">
+          <div class="chart-header">
+            <div class="chart-title">Quick Actions</div>
+          </div>
+          <div class="quick-actions-list">
+            <a href="#" class="action-btn">
+              <div class="action-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                  <polyline points="22 4 12 14.01 9 11.01"/>
+                </svg>
+              </div>
+              <span>Schedule Irrigation</span>
+            </a>
+            <a href="#" class="action-btn">
+              <div class="action-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
+                </svg>
+              </div>
+              <span>Soil Test Request</span>
+            </a>
+            <a href="#" class="action-btn">
+              <div class="action-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"/>
+                  <line x1="12" y1="8" x2="12" y2="12"/>
+                  <line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>
+              </div>
+              <span>Generate Report</span>
+            </a>
+            <a href="#" class="action-btn">
+              <div class="action-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="17 8 12 3 7 8"/>
+                  <line x1="12" y1="3" x2="12" y2="15"/>
+                </svg>
+              </div>
+              <span>Export Data</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <div class="chart-title">Recent Activity</div>
+          </div>
+          <div class="data-table">
+            <table>
+              <tbody>
+                <tr>
+                  <td>2 hours ago</td>
+                  <td>Irrigation started</td>
+                </tr>
+                <tr>
+                  <td>4 hours ago</td>
+                  <td>Soil moisture check</td>
+                </tr>
+                <tr>
+                  <td>1 day ago</td>
+                  <td>Fertilizer applied</td>
+                </tr>
+                <tr>
+                  <td>2 days ago</td>
+                  <td>Pest inspection</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</main>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Include Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Initialize dashboard
+  initializeDashboard();
+  
+  // Set up filter buttons
+  setupFilters();
+  
+  // Initialize all charts
+  initializeCharts();
+  
+  // Set up real-time updates
+  setupRealTimeUpdates();
+});
+
+function initializeDashboard() {
+  console.log('🚀 Farm Monitoring Dashboard Initialized');
+  
+  // Update time display
+  updateTimeDisplay();
+  setInterval(updateTimeDisplay, 60000); // Update every minute
+  
+  // Set up tooltips
+  setupTooltips();
+}
+
+function updateTimeDisplay() {
+  const now = new Date();
+  const timeString = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+  const dateString = now.toLocaleDateString('en-US', { 
+    weekday: 'long', 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric' 
+  });
+  
+  // Update any time/date displays if present
+  const timeElements = document.querySelectorAll('.current-time');
+  timeElements.forEach(el => {
+    el.textContent = `${dateString} • ${timeString}`;
+  });
+}
+
+function setupFilters() {
+  const filterBtns = document.querySelectorAll('.filter-btn');
+  const periodBtns = document.querySelectorAll('.filter-btn[data-period]');
+  
+  periodBtns.forEach(btn => {
+    btn.addEventListener('click', function() {
+      // Remove active class from all period buttons
+      periodBtns.forEach(b => b.classList.remove('active'));
+      
+      // Add active class to clicked button
+      this.classList.add('active');
+      
+      // Get selected period
+      const period = this.dataset.period;
+      
+      // Update charts based on period
+      updateChartsForPeriod(period);
+      
+      // Show loading state
+      showLoadingState();
+      
+      // Simulate data loading
+      setTimeout(() => {
+        updateDashboardData(period);
+        hideLoadingState();
+      }, 1000);
+    });
+  });
+  
+  // Quick action buttons
+  const actionBtns = document.querySelectorAll('.action-btn');
+  actionBtns.forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      const action = this.querySelector('span').textContent;
+      showToast(`Action triggered: ${action}`, 'success');
+    });
+  });
+}
+
+function updateChartsForPeriod(period) {
+  console.log(`Updating charts for period: ${period}`);
+  
+  // Update chart data based on period
+  const periods = {
+    today: { days: 1, label: 'Hourly' },
+    week: { days: 7, label: 'Daily' },
+    month: { days: 30, label: 'Weekly' },
+    season: { days: 90, label: 'Monthly' }
+  };
+  
+  const periodConfig = periods[period];
+  
+  // Update all charts with new data
+  updateChartData(cropHealthChart, periodConfig);
+  updateChartData(temperatureChart, periodConfig);
+  updateChartData(rainfallChart, periodConfig);
+  updateChartData(growthChart, periodConfig);
+}
+
+function showLoadingState() {
+  const charts = document.querySelectorAll('.chart-container');
+  charts.forEach(chart => {
+    const loadingDiv = document.createElement('div');
+    loadingDiv.className = 'loading-chart';
+    loadingDiv.innerHTML = '<div class="loading-spinner"></div>';
+    chart.appendChild(loadingDiv);
+  });
+}
+
+function hideLoadingState() {
+  const loadingDivs = document.querySelectorAll('.loading-chart');
+  loadingDivs.forEach(div => div.remove());
+}
+
+function updateDashboardData(period) {
+  // Simulate updating KPI cards with new data
+  const kpiCards = document.querySelectorAll('.kpi-card');
+  kpiCards.forEach(card => {
+    const valueElement = card.querySelector('.kpi-value');
+    const changeElement = card.querySelector('.kpi-change');
+    
+    if (valueElement && changeElement) {
+      // Generate random updated values (in real app, this would be from API)
+      const currentValue = parseFloat(valueElement.textContent.replace(/[^\d.]/g, ''));
+      const newValue = currentValue + (Math.random() * 5 - 2.5);
+      const changePercent = ((newValue - currentValue) / currentValue * 100).toFixed(1);
+      
+      // Update display
+      if (valueElement.textContent.includes('%')) {
+        valueElement.textContent = `${Math.max(0, Math.min(100, newValue)).toFixed(1)}%`;
+      } else if (valueElement.textContent.includes('°C')) {
+        valueElement.textContent = `${newValue.toFixed(1)}°C`;
+      } else if (valueElement.textContent.includes('T/ha')) {
+        valueElement.textContent = `${newValue.toFixed(1)}T/ha`;
+      } else {
+        valueElement.textContent = Math.round(newValue).toLocaleString();
+      }
+      
+      // Update change indicator
+      if (changePercent > 0) {
+        changeElement.className = 'kpi-change positive';
+        changeElement.innerHTML = `
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="18 15 12 9 6 15"/>
+          </svg>
+          +${Math.abs(changePercent)}% from previous
+        `;
+      } else if (changePercent < 0) {
+        changeElement.className = 'kpi-change negative';
+        changeElement.innerHTML = `
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+          -${Math.abs(changePercent)}% from previous
+        `;
+      } else {
+        changeElement.className = 'kpi-change neutral';
+        changeElement.textContent = 'No change from previous';
+      }
+    }
+  });
+  
+  // Update weather widget
+  updateWeatherWidget(period);
+}
+
+function updateWeatherWidget(period) {
+  const tempElement = document.querySelector('.weather-temp');
+  const forecastElements = document.querySelectorAll('.forecast-day-temp');
+  
+  if (tempElement) {
+    const currentTemp = parseFloat(tempElement.textContent.replace('°C', ''));
+    const newTemp = currentTemp + (Math.random() * 4 - 2);
+    tempElement.textContent = `${newTemp.toFixed(0)}°C`;
+  }
+  
+  forecastElements.forEach((element, index) => {
+    const currentTemp = parseFloat(element.textContent.replace('°', ''));
+    const newTemp = currentTemp + (Math.random() * 6 - 3);
+    element.textContent = `${newTemp.toFixed(0)}°`;
+  });
+}
+
+function setupTooltips() {
+  // Add tooltips to chart elements
+  const chartElements = document.querySelectorAll('.chart-container');
+  
+  chartElements.forEach(chart => {
+    chart.addEventListener('mousemove', function(e) {
+      // In a real implementation, this would show data point details
+      // For now, we'll just demonstrate the concept
+      if (e.target.closest('canvas')) {
+        // Tooltip logic would go here
+      }
+    });
+  });
+}
+
+// Chart instances
+let cropHealthChart, temperatureChart, rainfallChart, growthChart;
+
+function initializeCharts() {
+  // Initialize Crop Health Chart
+  const cropHealthCtx = document.getElementById('cropHealthChart').getContext('2d');
+  cropHealthChart = new Chart(cropHealthCtx, {
+    type: 'bar',
+    data: {
+      labels: ['North Field', 'South Field', 'East Field', 'West Field', 'Central Field'],
+      datasets: [{
+        label: 'Crop Health Index',
+        data: [92, 78, 85, 65, 88],
+        backgroundColor: [
+          'rgba(34, 197, 94, 0.8)',
+          'rgba(134, 239, 172, 0.8)',
+          'rgba(74, 222, 128, 0.8)',
+          'rgba(251, 191, 36, 0.8)',
+          'rgba(163, 230, 53, 0.8)'
+        ],
+        borderColor: [
+          'rgb(34, 197, 94)',
+          'rgb(134, 239, 172)',
+          'rgb(74, 222, 128)',
+          'rgb(251, 191, 36)',
+          'rgb(163, 230, 53)'
+        ],
+        borderWidth: 1,
+        borderRadius: 6
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: false
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              return `Health: ${context.raw}%`;
+            }
+          }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          max: 100,
+          title: {
+            display: true,
+            text: 'Health Index (%)'
+          },
+          grid: {
+            color: 'rgba(0, 0, 0, 0.05)'
+          }
+        },
+        x: {
+          grid: {
+            display: false
+          }
+        }
+      }
+    }
+  });
+
+  // Initialize Temperature Chart
+  const temperatureCtx = document.getElementById('temperatureChart').getContext('2d');
+  temperatureChart = new Chart(temperatureCtx, {
+    type: 'line',
+    data: {
+      labels: ['6 AM', '9 AM', '12 PM', '3 PM', '6 PM', '9 PM'],
+      datasets: [{
+        label: 'Temperature',
+        data: [18, 22, 28, 32, 26, 20],
+        borderColor: 'rgb(239, 68, 68)',
+        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+        borderWidth: 2,
+        tension: 0.4,
+        fill: true,
+        pointBackgroundColor: 'rgb(239, 68, 68)',
+        pointBorderColor: '#ffffff',
+        pointBorderWidth: 2,
+        pointRadius: 6,
+        pointHoverRadius: 8
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: false
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: false,
+          min: 15,
+          max: 35,
+          title: {
+            display: true,
+            text: 'Temperature (°C)'
+          },
+          grid: {
+            color: 'rgba(0, 0, 0, 0.05)'
+          }
+        },
+        x: {
+          grid: {
+            color: 'rgba(0, 0, 0, 0.05)'
+          }
+        }
+      }
+    }
+  });
+
+  // Initialize Rainfall Chart
+  const rainfallCtx = document.getElementById('rainfallChart').getContext('2d');
+  rainfallChart = new Chart(rainfallCtx, {
+    type: 'bar',
+    data: {
+      labels: ['Today', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6', 'Day 7'],
+      datasets: [
+        {
+          label: 'Predicted Rainfall',
+          data: [2.4, 8.7, 15.2, 6.8, 3.2, 1.5, 0.8],
+          backgroundColor: [
+            'rgba(59, 130, 246, 0.8)',
+            'rgba(59, 130, 246, 0.8)',
+            'rgba(239, 68, 68, 0.8)',
+            'rgba(59, 130, 246, 0.8)',
+            'rgba(59, 130, 246, 0.8)',
+            'rgba(59, 130, 246, 0.8)',
+            'rgba(59, 130, 246, 0.8)'
+          ],
+          borderColor: 'rgb(59, 130, 246)',
+          borderWidth: 1,
+          borderRadius: 4
+        },
+        {
+          label: 'Rain Probability',
+          data: [40, 75, 90, 60, 35, 20, 10],
+          type: 'line',
+          borderColor: 'rgb(245, 158, 11)',
+          backgroundColor: 'rgba(245, 158, 11, 0.1)',
+          borderWidth: 2,
+          tension: 0.4,
+          fill: false,
+          yAxisID: 'y1'
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'top',
+        }
+      },
+      scales: {
+        y: {
+          type: 'linear',
+          display: true,
+          position: 'left',
+          title: {
+            display: true,
+            text: 'Rainfall (mm)'
+          },
+          grid: {
+            color: 'rgba(0, 0, 0, 0.05)'
+          }
+        },
+        y1: {
+          type: 'linear',
+          display: true,
+          position: 'right',
+          title: {
+            display: true,
+            text: 'Probability (%)'
+          },
+          min: 0,
+          max: 100,
+          grid: {
+            drawOnChartArea: false
+          }
+        },
+        x: {
+          grid: {
+            color: 'rgba(0, 0, 0, 0.05)'
+          }
+        }
+      }
+    }
+  });
+
+  // Initialize Growth Chart
+  const growthCtx = document.getElementById('growthChart').getContext('2d');
+  growthChart = new Chart(growthCtx, {
+    type: 'line',
+    data: {
+      labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6', 'Week 7', 'Week 8'],
+      datasets: [
+        {
+          label: 'Actual Growth',
+          data: [10, 25, 45, 60, 75, 85, 92, 96],
+          borderColor: 'rgb(34, 197, 94)',
+          backgroundColor: 'rgba(34, 197, 94, 0.1)',
+          borderWidth: 3,
+          tension: 0.3,
+          fill: true
+        },
+        {
+          label: 'Expected Growth',
+          data: [15, 30, 50, 65, 80, 90, 95, 100],
+          borderColor: 'rgba(107, 114, 128, 0.5)',
+          borderWidth: 2,
+          borderDash: [5, 5],
+          fill: false,
+          pointRadius: 0
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'top',
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          max: 100,
+          title: {
+            display: true,
+            text: 'Growth Progress (%)'
+          },
+          grid: {
+            color: 'rgba(0, 0, 0, 0.05)'
+          }
+        },
+        x: {
+          grid: {
+            color: 'rgba(0, 0, 0, 0.05)'
+          }
+        }
+      }
+    }
+  });
+}
+
+function updateChartData(chart, periodConfig) {
+  if (!chart) return;
+  
+  // Generate new data based on period
+  const newData = generateMockData(periodConfig.days, chart.config.type);
+  
+  // Update chart data
+  chart.data.datasets.forEach((dataset, index) => {
+    if (index === 0) {
+      dataset.data = newData;
+    }
+  });
+  
+  // Update labels if needed
+  if (periodConfig.label) {
+    chart.data.labels = generateLabels(periodConfig.days, periodConfig.label);
+  }
+  
+  chart.update();
+}
+
+function generateMockData(count, chartType) {
+  const data = [];
+  let value = 50; // Starting value
+  
+  for (let i = 0; i < count; i++) {
+    // Add some randomness
+    const change = (Math.random() * 10 - 5);
+    value = Math.max(0, Math.min(100, value + change));
+    
+    if (chartType === 'bar') {
+      // For bar charts, use more varied data
+      data.push(Math.round(Math.random() * 30 + 70));
+    } else {
+      // For line charts, use smoother data
+      data.push(Math.round(value));
+    }
+  }
+  
+  return data;
+}
+
+function generateLabels(count, type) {
+  const labels = [];
+  const now = new Date();
+  
+  for (let i = 0; i < count; i++) {
+    const date = new Date();
+    date.setDate(now.getDate() - (count - i - 1));
+    
+    if (type === 'Hourly') {
+      labels.push(`${i + 6}:00`);
+    } else if (type === 'Daily') {
+      labels.push(date.toLocaleDateString('en-US', { weekday: 'short' }));
+    } else if (type === 'Weekly') {
+      labels.push(`Week ${i + 1}`);
+    } else if (type === 'Monthly') {
+      labels.push(date.toLocaleDateString('en-US', { month: 'short' }));
+    }
+  }
+  
+  return labels;
+}
+
+function setupRealTimeUpdates() {
+  // Simulate real-time data updates
+  setInterval(() => {
+    // Update KPI values randomly
+    const kpiValues = document.querySelectorAll('.kpi-value');
+    kpiValues.forEach(valueElement => {
+      const currentValue = parseFloat(valueElement.textContent.replace(/[^\d.]/g, ''));
+      if (!isNaN(currentValue)) {
+        const change = (Math.random() * 0.5 - 0.25);
+        const newValue = Math.max(0, Math.min(100, currentValue + change));
+        
+        if (valueElement.textContent.includes('%')) {
+          valueElement.textContent = `${newValue.toFixed(1)}%`;
+        } else if (valueElement.textContent.includes('°C')) {
+          valueElement.textContent = `${newValue.toFixed(1)}°C`;
+        }
+      }
+    });
+    
+    // Add new activity to recent activity
+    const activities = [
+      'Soil sensor updated',
+      'Weather data refreshed',
+      'Irrigation system checked',
+      'Crop health scan completed',
+      'Pest monitoring updated'
+    ];
+    
+    const randomActivity = activities[Math.floor(Math.random() * activities.length)];
+    addRecentActivity(randomActivity);
+    
+  }, 30000); // Update every 30 seconds
+}
+
+function addRecentActivity(activity) {
+  const activityTable = document.querySelector('.data-table tbody');
+  if (activityTable) {
+    const now = new Date();
+    const timeString = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+    
+    const newRow = document.createElement('tr');
+    newRow.innerHTML = `
+      <td>Just now</td>
+      <td>${activity}</td>
+    `;
+    
+    // Add at the beginning
+    activityTable.insertBefore(newRow, activityTable.firstChild);
+    
+    // Keep only last 4 activities
+    const rows = activityTable.querySelectorAll('tr');
+    if (rows.length > 4) {
+      rows[rows.length - 1].remove();
+    }
+  }
+}
+
+function showToast(message, type = 'info') {
+  // Remove existing toasts
+  const existingToasts = document.querySelectorAll('.dashboard-toast');
+  existingToasts.forEach(toast => toast.remove());
+
+  const toast = document.createElement('div');
+  toast.className = `dashboard-toast toast-${type}`;
+  
+  const icons = {
+    success: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>',
+    error: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>',
+    warning: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>',
+    info: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>'
+  };
+  
+  toast.innerHTML = `${icons[type] || icons.info}<span>${message}</span>`;
+  
+  // Add toast styles if not already in CSS
+  if (!document.getElementById('dashboard-toast-styles')) {
+    const style = document.createElement('style');
+    style.id = 'dashboard-toast-styles';
+    style.textContent = `
+      .dashboard-toast {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 12px 20px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 14px;
+        font-weight: 500;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+        z-index: 9999;
+        animation: slideInRight 0.3s ease-out;
+        background: white;
+        border: 1px solid var(--farmer-200);
+      }
+      .toast-success {
+        background: #dcfce7;
+        color: #166534;
+        border-color: #bbf7d0;
+      }
+      .toast-error {
+        background: #fee2e2;
+        color: #991b1b;
+        border-color: #fecaca;
+      }
+      .toast-warning {
+        background: #fef3c7;
+        color: #92400e;
+        border-color: #fde68a;
+      }
+      .toast-info {
+        background: #dbeafe;
+        color: #1e40af;
+        border-color: #bfdbfe;
+      }
+      @keyframes slideInRight {
+        from {
+          transform: translateX(400px);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+  
+  document.body.appendChild(toast);
+  
+  setTimeout(() => {
+    toast.style.animation = 'slideInRight 0.3s ease-out reverse';
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
+}
+
+// Export dashboard data function
+function exportDashboardData() {
+  const data = {
+    timestamp: new Date().toISOString(),
+    kpis: {},
+    charts: {}
+  };
+  
+  // Collect KPI data
+  document.querySelectorAll('.kpi-card').forEach(card => {
+    const title = card.querySelector('.kpi-title').textContent;
+    const value = card.querySelector('.kpi-value').textContent;
+    data.kpis[title] = value;
+  });
+  
+  // Show export confirmation
+  showToast('Dashboard data exported successfully!', 'success');
+  
+  // In a real implementation, this would trigger a download
+  console.log('Exporting data:', data);
+}
+
+// Make export function available globally
+window.exportDashboardData = exportDashboardData;
+
+// Initialize dashboard on load
+window.addEventListener('load', initializeDashboard);
+</script>
+{% endblock %}

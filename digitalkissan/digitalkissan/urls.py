@@ -22,6 +22,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('',views.index,name='index'),
     path('ai_detection/',include('ai_detection.urls')),
+    path('farmmonitor/',include('farmmonitor.urls')),
 ]
 
 from django.conf import settings
