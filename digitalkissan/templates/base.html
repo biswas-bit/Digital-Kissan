@@ -151,7 +151,7 @@
 
           <!-- Desktop Navigation -->
           <div class="nav-links">
-            <a href="" class="nav-link">
+            <a href="{% url 'index' %}" class="nav-link">
               <svg
                 width="16"
                 height="16"
@@ -171,23 +171,15 @@
               </svg>
               <span>Home</span>
             </a>
-            <a href=" " class="nav-link">
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <circle cx="8" cy="21" r="1" />
-                <circle cx="19" cy="21" r="1" />
-                <path
-                  d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"
-                />
-              </svg>
-              <span>Marketplace</span>
-            </a>
+          <a href="/iot/" class="nav-link">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <!-- Example IoT device icon -->
+    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+    <circle cx="12" cy="12" r="3"/>
+    <path d="M12 5v2M12 17v2M5 12h2M17 12h2"/>
+  </svg>
+  <span>Farm Monitoring</span>
+</a>
             <a href="{% url 'ai_detection:disease_detection'%}" class="nav-link">
               <svg
                 width="16"
