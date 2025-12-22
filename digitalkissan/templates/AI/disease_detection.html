@@ -2058,33 +2058,30 @@ body {
 {% endblock %}
 
 {% block extra_js %}
-<script>
-// Disease Detection specific functionality
+// Disease Detection Frontend - Updated for Backend Integration
 
 document.addEventListener("DOMContentLoaded", function () {
   initializeDiseaseDetection();
 });
 
+// Global variable to store the current image file
+let currentImageFile = null;
+
 function initializeDiseaseDetection() {
   const imageUpload = document.getElementById("imageUpload");
   const uploadArea = document.getElementById("uploadArea");
-  const imagePreview = document.getElementById("imagePreview");
-  const analysisResult = document.getElementById("analysisResult");
   const analyzeBtn = document.getElementById("analyzeBtn");
 
-  // File input change event
   if (imageUpload) {
     imageUpload.addEventListener("change", handleFileSelect);
   }
 
-  // Drag and drop events
   if (uploadArea) {
     uploadArea.addEventListener("dragover", handleDragOver);
     uploadArea.addEventListener("dragleave", handleDragLeave);
     uploadArea.addEventListener("drop", handleDrop);
   }
 
-  // Analyze button click
   if (analyzeBtn) {
     analyzeBtn.addEventListener("click", analyzeImage);
   }
@@ -2093,6 +2090,7 @@ function initializeDiseaseDetection() {
 function handleFileSelect(event) {
   const file = event.target.files[0];
   if (file && file.type.startsWith("image/")) {
+    currentImageFile = file;
     displayImagePreview(file);
   } else if (file) {
     showToast("Please select a valid image file", "error");
@@ -2120,9 +2118,9 @@ function handleDrop(event) {
 
   const files = event.dataTransfer.files;
   if (files.length > 0 && files[0].type.startsWith("image/")) {
+    currentImageFile = files[0];
     displayImagePreview(files[0]);
 
-    // Update the file input
     const imageUpload = document.getElementById("imageUpload");
     if (imageUpload) {
       const dataTransfer = new DataTransfer();
@@ -2144,27 +2142,24 @@ function displayImagePreview(file) {
   const reader = new FileReader();
   reader.onload = function (e) {
     imagePreview.innerHTML = `
-            <div class="image-preview-container">
-                <img src="${e.target.result}" alt="Preview" class="preview-image">
-                <button class="remove-image-btn" onclick="removeImage()">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg>
-                </button>
-            </div>
-        `;
+      <div class="image-preview-container">
+        <img src="${e.target.result}" alt="Preview" class="preview-image">
+        <button class="remove-image-btn" onclick="removeImage()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+    `;
 
-    // Hide upload area and show preview
     uploadArea.style.display = "none";
     imagePreview.classList.remove("hidden");
 
-    // Enable analyze button
     if (analyzeBtn) {
       analyzeBtn.disabled = false;
     }
 
-    // Hide any previous analysis results
     const analysisResult = document.getElementById("analysisResult");
     if (analysisResult) {
       analysisResult.classList.add("hidden");
@@ -2181,7 +2176,8 @@ function removeImage() {
   const analyzeBtn = document.getElementById("analyzeBtn");
   const analysisResult = document.getElementById("analysisResult");
 
-  // Reset UI
+  currentImageFile = null;
+
   if (imagePreview) {
     imagePreview.classList.add("hidden");
     imagePreview.innerHTML = "";
@@ -2204,11 +2200,11 @@ function removeImage() {
   }
 }
 
-function analyzeImage() {
+async function analyzeImage() {
   const analyzeBtn = document.getElementById("analyzeBtn");
   const imagePreview = document.getElementById("imagePreview");
 
-  if (!imagePreview || imagePreview.classList.contains("hidden")) {
+  if (!currentImageFile) {
     showToast("Please upload an image first", "warning");
     return;
   }
@@ -2216,146 +2212,228 @@ function analyzeImage() {
   // Show loading state
   const originalText = analyzeBtn.innerHTML;
   analyzeBtn.innerHTML = `
-        <div class="loading"></div>
-        Analyzing Plant...
-    `;
+    <div class="loading"></div>
+    Analyzing Plant...
+  `;
   analyzeBtn.disabled = true;
 
-  // Add analyzing class to preview
-  imagePreview.classList.add("analyzing");
+  if (imagePreview) {
+    imagePreview.classList.add("analyzing");
+  }
 
-  // Simulate AI analysis (3 seconds)
-  setTimeout(() => {
-    showAnalysisResult();
+  try {
+    // Create FormData and append the image
+    const formData = new FormData();
+    formData.append('image', currentImageFile);
 
+    // Get CSRF token
+    const csrfToken = getCookie('csrftoken');
+
+    // Make API call
+    const response = await fetch('/ai/api/analyze/', {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': csrfToken
+      },
+      body: formData
+    });
+
+    const data = await response.json();
+
+    if (!response.ok || !data.success) {
+      throw new Error(data.error || 'Analysis failed');
+    }
+
+    // Display results
+    showAnalysisResult(data);
+
+    // Add to recent scans
+    const status = data.is_healthy ? 'success' : 
+                   data.severity === 'High' ? 'error' : 'warning';
+    addToRecentScans(
+      data.plant, 
+      data.disease, 
+      Math.round(data.confidence_percentage), 
+      status
+    );
+
+    showToast("Analysis complete!", "success");
+
+  } catch (error) {
+    console.error('Analysis error:', error);
+    showToast(error.message || 'Failed to analyze image. Please try again.', 'error');
+  } finally {
     // Reset button
     analyzeBtn.innerHTML = originalText;
     analyzeBtn.disabled = false;
 
-    // Remove analyzing class
-    imagePreview.classList.remove("analyzing");
-
-    // Add to recent scans
-    addToRecentScans("Current Plant", "Late Blight", 92, "error");
-  }, 3000);
+    if (imagePreview) {
+      imagePreview.classList.remove("analyzing");
+    }
+  }
 }
 
-function showAnalysisResult() {
+function showAnalysisResult(data) {
   const analysisResult = document.getElementById("analysisResult");
-
   if (!analysisResult) return;
 
-  // Generate analysis result HTML
+  // Determine severity color and badge
+  const severityInfo = getSeverityInfo(data.severity, data.is_healthy);
+  
+  // Get treatment recommendations
+  const treatments = data.recommendations?.short_term_treatments || 
+                    data.recommendations?.immediate_actions || 
+                    ['Monitor plant health regularly', 'Ensure proper watering', 'Maintain good air circulation'];
+  
+  // Get prevention tips
+  const preventions = data.recommendations?.long_term_prevention || 
+                     ['Regular plant inspection', 'Proper spacing between plants', 'Clean gardening tools', 'Use quality soil'];
+
+  // Get additional info
+  const additionalInfo = data.additional_info?.treatment?.[0] || 
+                        (data.is_healthy ? 
+                          'Your plant appears healthy. Continue with regular care and monitoring.' :
+                          `${data.disease} requires attention. Follow the treatment recommendations below.`);
+
   const resultHTML = `
-        <div class="analysis-card">
-            <div class="analysis-header fade-in-up">
-                <div class="analysis-icon">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="10"/>
-                        <polyline points="8,12 12,16 16,12"/>
-                    </svg>
-                </div>
-                <h3 class="typing-text" data-text="Analysis Complete"></h3>
-            </div>
-
-            <div class="analysis-results">
-                <div class="result-grid">
-                    <div class="result-item disease slide-in-left" style="animation-delay: 0.5s;">
-                        <h4>Disease Detected</h4>
-                        <p class="result-value typing-text" data-text="Late Blight" data-delay="1000"></p>
-                        <span class="confidence-badge fade-in" style="animation-delay: 1.5s;">92% Confidence</span>
-                    </div>
-                    <div class="result-item severity slide-in-right" style="animation-delay: 0.7s;">
-                        <h4>Severity Level</h4>
-                        <p class="result-value typing-text" data-text="Moderate" data-delay="1200"></p>
-                        <span class="affected-badge fade-in" style="animation-delay: 1.7s;">65% Affected</span>
-                    </div>
-                </div>
-
-                <div class="treatment-section fade-in-up" style="animation-delay: 2s;">
-                    <h4>
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M9 12l2 2 4-4"/>
-                            <path d="M21 12c.552 0 1.005-.449.95-.998a10 10 0 0 0-8.953-8.951c-.55-.055-.998.398-.998.95v8a1 1 0 0 0 1 1z"/>
-                            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7"/>
-                        </svg>
-                        <span class="typing-text" data-text="Treatment Recommendations" data-delay="2500"></span>
-                    </h4>
-                    <ol class="treatment-list">
-                        <li class="slide-in-left" style="animation-delay: 3s;">Remove affected leaves immediately</li>
-                        <li class="slide-in-left" style="animation-delay: 3.2s;">Apply copper-based fungicide</li>
-                        <li class="slide-in-left" style="animation-delay: 3.4s;">Improve air circulation around plants</li>
-                        <li class="slide-in-left" style="animation-delay: 3.6s;">Avoid overhead watering</li>
-                    </ol>
-                </div>
-
-                <div class="prevention-section fade-in-up" style="animation-delay: 4s;">
-                    <h4>
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
-                            <line x1="12" y1="9" x2="12" y2="13"/>
-                            <line x1="12" y1="17" x2="12.01" y2="17"/>
-                        </svg>
-                        <span class="typing-text" data-text="Prevention Tips" data-delay="4500"></span>
-                    </h4>
-                    <ul class="prevention-list">
-                        <li class="slide-in-right" style="animation-delay: 5s;">Plant resistant varieties</li>
-                        <li class="slide-in-right" style="animation-delay: 5.2s;">Ensure proper spacing between plants</li>
-                        <li class="slide-in-right" style="animation-delay: 5.4s;">Water at soil level</li>
-                        <li class="slide-in-right" style="animation-delay: 5.6s;">Apply preventive fungicide sprays</li>
-                    </ul>
-                </div>
-
-                <div class="alert alert-info pulse-glow" style="animation-delay: 6s;">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="10"/>
-                        <line x1="12" y1="16" x2="12" y2="12"/>
-                        <line x1="12" y1="8" x2="12.01" y2="8"/>
-                    </svg>
-                    <p class="typing-text" data-text="Late blight is a serious disease that can spread rapidly in cool, wet conditions. Early detection and treatment are crucial for preventing total crop loss." data-delay="6500"></p>
-                </div>
-
-                <div class="action-buttons fade-in-up" style="animation-delay: 8s;">
-                    <button class="btn btn-primary" onclick="downloadReport()">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                            <polyline points="7,10 12,15 17,10"/>
-                            <line x1="12" y1="15" x2="12" y2="3"/>
-                        </svg>
-                        Download Report
-                    </button>
-                    <button class="btn btn-outline" onclick="shareWithExpert()">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="18" cy="5" r="3"/>
-                            <circle cx="6" cy="12" r="3"/>
-                            <circle cx="18" cy="19" r="3"/>
-                            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
-                            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
-                        </svg>
-                        Share with Expert
-                    </button>
-                    <button class="btn btn-outline" onclick="learnMore()">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
-                            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
-                        </svg>
-                        Learn More
-                    </button>
-                </div>
-            </div>
+    <div class="analysis-card">
+      <div class="analysis-header fade-in-up">
+        <div class="analysis-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="8,12 12,16 16,12"/>
+          </svg>
         </div>
-    `;
+        <h3 class="typing-text" data-text="Analysis Complete"></h3>
+      </div>
+
+      <div class="analysis-results">
+        <div class="result-grid">
+          <div class="result-item disease slide-in-left" style="animation-delay: 0.5s; ${severityInfo.bgColor}">
+            <h4>${data.is_healthy ? 'Plant Status' : 'Disease Detected'}</h4>
+            <p class="result-value typing-text" data-text="${data.disease}" data-delay="1000" style="${severityInfo.textColor}"></p>
+            <span class="confidence-badge fade-in" style="animation-delay: 1.5s;">${Math.round(data.confidence_percentage)}% Confidence</span>
+          </div>
+          <div class="result-item severity slide-in-right" style="animation-delay: 0.7s;">
+            <h4>Severity Level</h4>
+            <p class="result-value typing-text" data-text="${data.severity}" data-delay="1200"></p>
+            <span class="affected-badge fade-in" style="animation-delay: 1.7s;">${data.plant}</span>
+          </div>
+        </div>
+
+        ${!data.is_healthy ? `
+        <div class="treatment-section fade-in-up" style="animation-delay: 2s;">
+          <h4>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 12l2 2 4-4"/>
+              <path d="M21 12c.552 0 1.005-.449.95-.998a10 10 0 0 0-8.953-8.951c-.55-.055-.998.398-.998.95v8a1 1 0 0 0 1 1z"/>
+              <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7"/>
+            </svg>
+            <span class="typing-text" data-text="Treatment Recommendations" data-delay="2500"></span>
+          </h4>
+          <ol class="treatment-list">
+            ${treatments.slice(0, 4).map((treatment, idx) => `
+              <li class="slide-in-left" style="animation-delay: ${3 + idx * 0.2}s;">${treatment}</li>
+            `).join('')}
+          </ol>
+        </div>
+        ` : ''}
+
+        <div class="prevention-section fade-in-up" style="animation-delay: ${data.is_healthy ? 2 : 4}s;">
+          <h4>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+              <line x1="12" y1="9" x2="12" y2="13"/>
+              <line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+            <span class="typing-text" data-text="${data.is_healthy ? 'Care Tips' : 'Prevention Tips'}" data-delay="${data.is_healthy ? 2500 : 4500}"></span>
+          </h4>
+          <ul class="prevention-list">
+            ${preventions.slice(0, 4).map((prevention, idx) => `
+              <li class="slide-in-right" style="animation-delay: ${(data.is_healthy ? 3 : 5) + idx * 0.2}s;">${prevention}</li>
+            `).join('')}
+          </ul>
+        </div>
+
+        <div class="alert ${data.is_healthy ? 'alert-success' : 'alert-info'} pulse-glow" style="animation-delay: ${data.is_healthy ? 4 : 6}s;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="16" x2="12" y2="12"/>
+            <line x1="12" y1="8" x2="12.01" y2="8"/>
+          </svg>
+          <p class="typing-text" data-text="${additionalInfo}" data-delay="${data.is_healthy ? 4500 : 6500}"></p>
+        </div>
+
+        <div class="action-buttons fade-in-up" style="animation-delay: ${data.is_healthy ? 5 : 8}s;">
+          <button class="btn btn-primary" onclick="downloadReport()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7,10 12,15 17,10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Download Report
+          </button>
+          <button class="btn btn-outline" onclick="shareWithExpert()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="18" cy="5" r="3"/>
+              <circle cx="6" cy="12" r="3"/>
+              <circle cx="18" cy="19" r="3"/>
+              <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+              <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+            </svg>
+            Share with Expert
+          </button>
+          <button class="btn btn-outline" onclick="analyzeAnother()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="17,8 12,3 7,8"/>
+              <line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+            Analyze Another
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
 
   analysisResult.innerHTML = resultHTML;
   analysisResult.classList.remove("hidden");
+
+  // Store result for download
+  window.currentAnalysisResult = data;
 
   initializeTextAnimations();
 
   setTimeout(() => {
     analysisResult.scrollIntoView({ behavior: "smooth", block: "start" });
   }, 500);
+}
 
-  showToast("Analysis complete! Check the results below.", "success");
+function getSeverityInfo(severity, isHealthy) {
+  if (isHealthy) {
+    return {
+      bgColor: 'background-color: #f0fdf4; border: 1px solid #bbf7d0;',
+      textColor: 'color: #166534;'
+    };
+  }
+  
+  switch (severity) {
+    case 'High':
+      return {
+        bgColor: 'background-color: #fef2f2; border: 1px solid #fecaca;',
+        textColor: 'color: #dc2626;'
+      };
+    case 'Medium':
+      return {
+        bgColor: 'background-color: #fff7ed; border: 1px solid #fed7aa;',
+        textColor: 'color: #ea580c;'
+      };
+    default:
+      return {
+        bgColor: 'background-color: #fef3c7; border: 1px solid #fde68a;',
+        textColor: 'color: #f59e0b;'
+      };
+  }
 }
 
 function initializeTextAnimations() {
@@ -2368,12 +2446,11 @@ function initializeTextAnimations() {
     element.textContent = "";
 
     setTimeout(() => {
-      typeText(element, text, 50); // 50ms between each character
+      typeText(element, text, 50);
     }, delay);
   });
 }
 
-// Typing animation function
 function typeText(element, text, speed = 50) {
   let index = 0;
   element.textContent = "";
@@ -2384,8 +2461,7 @@ function typeText(element, text, speed = 50) {
       index++;
     } else {
       clearInterval(typeInterval);
-      // Add a subtle pulse effect when typing is complete
-      element.style.animation = "pulse-once 0.5s ease-in-out";
+      element.classList.add('typing-complete');
     }
   }, speed);
 }
@@ -2394,7 +2470,6 @@ function addToRecentScans(plantType, result, confidence, status) {
   const scanList = document.querySelector(".scan-list");
   if (!scanList) return;
 
-  // Create new scan item
   const scanItem = document.createElement("div");
   scanItem.className = "scan-item";
 
@@ -2406,26 +2481,23 @@ function addToRecentScans(plantType, result, confidence, status) {
         : "badge-error";
 
   scanItem.innerHTML = `
-        <div class="scan-info">
-            <h4>${plantType}</h4>
-            <p class="scan-time">Just now</p>
-        </div>
-        <div class="scan-result">
-            <span class="badge ${badgeClass}">${result}</span>
-            <p class="confidence">${confidence}%</p>
-        </div>
-    `;
+    <div class="scan-info">
+      <h4>${plantType}</h4>
+      <p class="scan-time">Just now</p>
+    </div>
+    <div class="scan-result">
+      <span class="badge ${badgeClass}">${result}</span>
+      <p class="confidence">${confidence}%</p>
+    </div>
+  `;
 
-  // Add to top of list
   scanList.insertBefore(scanItem, scanList.firstChild);
 
-  // Keep only the 5 most recent scans
   const scanItems = scanList.querySelectorAll(".scan-item");
   if (scanItems.length > 5) {
     scanList.removeChild(scanItems[scanItems.length - 1]);
   }
 
-  // Update timestamps for existing scans
   updateScanTimestamps();
 }
 
@@ -2448,222 +2520,163 @@ function updateScanTimestamps() {
 }
 
 function downloadReport() {
-  // Simulate downloading a report
-  showToast("Generating report...", "info");
+  if (!window.currentAnalysisResult) {
+    showToast("No analysis data available", "warning");
+    return;
+  }
 
-  setTimeout(() => {
-    // Create a simple text report
-    const reportContent = `
+  const data = window.currentAnalysisResult;
+  
+  const reportContent = `
 Plant Disease Analysis Report
 ============================
 
 Date: ${new Date().toLocaleDateString()}
 Time: ${new Date().toLocaleTimeString()}
 
-ANALYSIS RESULTS:
-- Disease: Late Blight
-- Confidence: 92%
-- Severity: Moderate
-- Affected Area: 65%
+PLANT INFORMATION:
+- Plant Type: ${data.plant}
+- Status: ${data.is_healthy ? 'Healthy' : 'Diseased'}
+- Disease: ${data.disease}
+- Confidence: ${Math.round(data.confidence_percentage)}%
+- Severity: ${data.severity}
 
+${!data.is_healthy && data.recommendations?.short_term_treatments ? `
 TREATMENT RECOMMENDATIONS:
-1. Remove affected leaves immediately
-2. Apply copper-based fungicide
-3. Improve air circulation around plants
-4. Avoid overhead watering
+${data.recommendations.short_term_treatments.map((t, i) => `${i + 1}. ${t}`).join('\n')}
+` : ''}
 
+${data.recommendations?.long_term_prevention ? `
 PREVENTION TIPS:
-- Plant resistant varieties
-- Ensure proper spacing between plants
-- Water at soil level
-- Apply preventive fungicide sprays
+${data.recommendations.long_term_prevention.map((p, i) => `${i + 1}. ${p}`).join('\n')}
+` : ''}
 
-ADDITIONAL INFORMATION:
-Late blight is a serious disease that can spread rapidly in cool, wet conditions. Early detection and treatment are crucial for preventing total crop loss.
+ADDITIONAL PREDICTIONS:
+${data.predictions.slice(1, 3).map((p, i) => `${i + 1}. ${p.class_name} (${Math.round(p.percentage)}%)`).join('\n')}
 
 Generated by Digital Kisan AI Disease Detection System
-        `;
+  `;
 
-    // Create and download the file
-    const blob = new Blob([reportContent], { type: "text/plain" });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `plant-disease-report-${new Date().getTime()}.txt`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    window.URL.revokeObjectURL(url);
+  const blob = new Blob([reportContent], { type: "text/plain" });
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `plant-analysis-${new Date().getTime()}.txt`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  window.URL.revokeObjectURL(url);
 
-    showToast("Report downloaded successfully!", "success");
-  }, 1500);
+  showToast("Report downloaded successfully!", "success");
 }
 
 function shareWithExpert() {
-  showToast("Redirecting to expert consultation...", "info");
-
-  setTimeout(() => {
-    // In a real app, this would prepare the data and redirect
-    window.location.href = " ";
-  }, 1000);
+  showToast("Expert consultation feature coming soon!", "info");
 }
 
-function learnMore() {
-  // Simulate opening an educational resource
-  const diseaseInfo = `
-Late Blight Information:
-
-Late blight is one of the most destructive diseases affecting tomatoes and potatoes. It's caused by the water mold Phytophthora infestans.
-
-Symptoms:
-- Dark, water-soaked spots on leaves
-- White fuzzy growth on leaf undersides
-- Brown streaks on stems
-- Dark, firm spots on fruit
-
-Conditions favoring disease:
-- Cool, wet weather (60-70°F)
-- High humidity
-- Poor air circulation
-
-Management strategies:
-- Use resistant varieties when available
-- Improve air circulation with proper spacing
-- Water at soil level to keep foliage dry
-- Apply preventive fungicides before symptoms appear
-- Remove infected plant material immediately
-
-For more detailed information, consult with our agricultural experts or visit our resource library.
-    `;
-
-  // Create a modal or redirect to an educational page
-  alert(diseaseInfo);
+function analyzeAnother() {
+  removeImage();
+  showToast("Ready for new analysis", "info");
 }
 
-// Take photo functionality (for mobile devices)
-function takePhoto() {
-  if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-    navigator.mediaDevices
-      .getUserMedia({
-        video: {
-          facingMode: "environment", // Use back camera if available
-        },
-      })
-      .then(function (stream) {
-        // Create video element to show camera feed
-        const video = document.createElement("video");
-        video.srcObject = stream;
-        video.play();
-
-        // Create a simple camera interface
-        const cameraModal = document.createElement("div");
-        cameraModal.className = "camera-modal";
-        cameraModal.innerHTML = `
-                <div class="camera-container">
-                    <div class="camera-header">
-                        <h3>Take a Photo</h3>
-                        <button onclick="closeCameraModal()" class="close-btn">×</button>
-                    </div>
-                    <div class="camera-preview"></div>
-                    <div class="camera-controls">
-                        <button onclick="capturePhoto()" class="btn btn-primary">Capture</button>
-                        <button onclick="closeCameraModal()" class="btn btn-outline">Cancel</button>
-                    </div>
-                </div>
-            `;
-
-        document.body.appendChild(cameraModal);
-        cameraModal.querySelector(".camera-preview").appendChild(video);
-
-        // Store stream reference for later cleanup
-        window.currentStream = stream;
-      })
-      .catch(function (error) {
-        console.error("Error accessing camera:", error);
-        showToast(
-          "Camera not available. Please use file upload instead.",
-          "warning",
-        );
-      });
-  } else {
-    showToast("Camera not supported on this device.", "warning");
-  }
-}
-
-function capturePhoto() {
-  const video = document.querySelector(".camera-preview video");
-  if (!video) return;
-
-  // Create canvas to capture frame
-  const canvas = document.createElement("canvas");
-  canvas.width = video.videoWidth;
-  canvas.height = video.videoHeight;
-
-  const ctx = canvas.getContext("2d");
-  ctx.drawImage(video, 0, 0);
-
-  // Convert to blob and create file
-  canvas.toBlob(
-    function (blob) {
-      const file = new File([blob], "camera-capture.jpg", {
-        type: "image/jpeg",
-      });
-
-      // Display the captured image
-      displayImagePreview(file);
-
-      // Update file input
-      const imageUpload = document.getElementById("imageUpload");
-      if (imageUpload) {
-        const dataTransfer = new DataTransfer();
-        dataTransfer.items.add(file);
-        imageUpload.files = dataTransfer.files;
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
       }
-
-      // Close camera modal
-      closeCameraModal();
-
-      showToast("Photo captured successfully!", "success");
-    },
-    "image/jpeg",
-    0.8,
-  );
+    }
+  }
+  return cookieValue;
 }
 
-function closeCameraModal() {
-  const modal = document.querySelector(".camera-modal");
-  if (modal) {
-    // Stop camera stream
-    if (window.currentStream) {
-      window.currentStream.getTracks().forEach((track) => track.stop());
-      window.currentStream = null;
-    }
+function showToast(message, type = "info") {
+  // Remove existing toasts
+  const existingToasts = document.querySelectorAll('.toast');
+  existingToasts.forEach(toast => toast.remove());
 
-    document.body.removeChild(modal);
+  const toast = document.createElement("div");
+  toast.className = `toast toast-${type}`;
+  
+  const icons = {
+    success: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>',
+    error: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>',
+    warning: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>',
+    info: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>'
+  };
+  
+  toast.innerHTML = `${icons[type] || icons.info}<span>${message}</span>`;
+  
+  // Add toast styles if not already in CSS
+  if (!document.getElementById('toast-styles')) {
+    const style = document.createElement('style');
+    style.id = 'toast-styles';
+    style.textContent = `
+      .toast {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 12px 20px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 14px;
+        font-weight: 500;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+        z-index: 9999;
+        animation: slideIn 0.3s ease-out;
+      }
+      .toast-success {
+        background-color: #dcfce7;
+        color: #166534;
+        border: 1px solid #bbf7d0;
+      }
+      .toast-error {
+        background-color: #fee2e2;
+        color: #991b1b;
+        border: 1px solid #fecaca;
+      }
+      .toast-warning {
+        background-color: #fef3c7;
+        color: #92400e;
+        border: 1px solid #fde68a;
+      }
+      .toast-info {
+        background-color: #dbeafe;
+        color: #1e40af;
+        border: 1px solid #bfdbfe;
+      }
+      @keyframes slideIn {
+        from {
+          transform: translateX(400px);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+    `;
+    document.head.appendChild(style);
   }
+  
+  document.body.appendChild(toast);
+  
+  setTimeout(() => {
+    toast.style.animation = 'slideIn 0.3s ease-out reverse';
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
 }
 
 // Make functions globally available
 window.removeImage = removeImage;
 window.downloadReport = downloadReport;
 window.shareWithExpert = shareWithExpert;
-window.learnMore = learnMore;
-window.takePhoto = takePhoto;
-window.capturePhoto = capturePhoto;
-window.closeCameraModal = closeCameraModal;
-
-// Helper function for showing toast messages
-function showToast(message, type = "info") {
-  const toast = document.createElement("div");
-  toast.className = `toast toast-${type}`;
-  toast.textContent = message;
-  
-  document.body.appendChild(toast);
-  
-  // Remove toast after 3 seconds
-  setTimeout(() => {
-    toast.remove();
-  }, 3000);
-}
+window.analyzeAnother = analyzeAnother;
 </script>
 {% endblock %}
