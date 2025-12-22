@@ -2060,6 +2060,7 @@ body {
 {% block extra_js %}
 // Disease Detection Frontend - Updated for Backend Integration
 
+<script>
 document.addEventListener("DOMContentLoaded", function () {
   initializeDiseaseDetection();
 });
@@ -2209,6 +2210,13 @@ async function analyzeImage() {
     return;
   }
 
+  console.log("🚀 Starting analysis...");
+  console.log("📁 File info:", {
+    name: currentImageFile.name,
+    size: currentImageFile.size,
+    type: currentImageFile.type
+  });
+
   // Show loading state
   const originalText = analyzeBtn.innerHTML;
   analyzeBtn.innerHTML = `
@@ -2225,43 +2233,119 @@ async function analyzeImage() {
     // Create FormData and append the image
     const formData = new FormData();
     formData.append('image', currentImageFile);
+    
+    // Log FormData contents
+    console.log("📦 FormData created");
+    for (let pair of formData.entries()) {
+      console.log(`  ${pair[0]}:`, pair[1]);
+    }
 
     // Get CSRF token
     const csrfToken = getCookie('csrftoken');
-
-    // Make API call
-    const response = await fetch('/ai/api/analyze/', {
-      method: 'POST',
-      headers: {
-        'X-CSRFToken': csrfToken
-      },
-      body: formData
-    });
-
-    const data = await response.json();
-
-    if (!response.ok || !data.success) {
-      throw new Error(data.error || 'Analysis failed');
+    console.log("🍪 CSRF Token:", csrfToken ? "Found" : "NOT FOUND");
+    
+    if (!csrfToken) {
+      console.error("❌ No CSRF token found!");
+      console.log("Available cookies:", document.cookie);
+      throw new Error('CSRF token not found. Please refresh the page.');
     }
 
-    // Display results
-    showAnalysisResult(data);
+    // Make API call with detailed logging
+    console.log("🌐 Making fetch request to /ai_detection/api/analyze/");
+    
+    const startTime = Date.now();
+    
+    try {
+      const response = await fetch('/ai_detection/api/analyze/', {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': csrfToken
+        },
+        credentials: 'same-origin',
+        body: formData
+      });
+      
+      const endTime = Date.now();
+      console.log(`⏱️ Request completed in ${endTime - startTime}ms`);
+      console.log("📊 Response status:", response.status, response.statusText);
+      console.log("📊 Response headers:");
+      response.headers.forEach((value, key) => {
+        console.log(`  ${key}: ${value}`);
+      });
 
-    // Add to recent scans
-    const status = data.is_healthy ? 'success' : 
-                   data.severity === 'High' ? 'error' : 'warning';
-    addToRecentScans(
-      data.plant, 
-      data.disease, 
-      Math.round(data.confidence_percentage), 
-      status
-    );
+      // Check if response is JSON
+      const contentType = response.headers.get('content-type');
+      console.log("📄 Content-Type:", contentType);
+      
+      if (!response.ok) {
+        let errorText = await response.text();
+        console.error("❌ Server error response:", errorText);
+        throw new Error(`Server error: ${response.status} ${response.statusText}`);
+      }
 
-    showToast("Analysis complete!", "success");
+      if (!contentType || !contentType.includes('application/json')) {
+        let text = await response.text();
+        console.error("❌ Response is not JSON:", text.substring(0, 200));
+        throw new Error('Server returned non-JSON response');
+      }
+
+      const data = await response.json();
+      console.log("✅ Response data received:", data);
+
+      if (!data.success) {
+        throw new Error(data.error || 'Analysis failed');
+      }
+
+      // Display results
+      showAnalysisResult(data);
+
+      // Add to recent scans
+      const status = data.is_healthy ? 'success' : 
+                     data.severity === 'High' ? 'error' : 'warning';
+      addToRecentScans(
+        data.plant, 
+        data.disease, 
+        Math.round(data.confidence_percentage), 
+        status
+      );
+
+      showToast("Analysis complete!", "success");
+
+    } catch (fetchError) {
+      console.error("❌ Fetch error details:", {
+        name: fetchError.name,
+        message: fetchError.message,
+        stack: fetchError.stack
+      });
+      throw fetchError;
+    }
 
   } catch (error) {
-    console.error('Analysis error:', error);
-    showToast(error.message || 'Failed to analyze image. Please try again.', 'error');
+    console.error('💥 Analysis error:', error);
+    
+    let errorMessage = error.message || 'Failed to analyze image';
+    
+    // Handle specific error types
+    if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
+      errorMessage = 'Network error. Please check: 1) Is Django server running? 2) Check browser console Network tab';
+    } else if (error.message.includes('CSRF')) {
+      errorMessage = 'Session error. Please refresh the page.';
+    } else if (error.message.includes('Server error')) {
+      // Keep server error message as is
+    } else {
+      errorMessage = `Error: ${error.message}`;
+    }
+    
+    showToast(errorMessage, 'error');
+    
+    // Additional debugging
+    console.log("🔍 Debug info:", {
+      currentPage: window.location.href,
+      apiUrl: '/ai_detection/api/analyze/',
+      csrfToken: getCookie('csrftoken') ? 'Present' : 'Missing',
+      file: currentImageFile ? 'Present' : 'Missing'
+    });
+    
   } finally {
     // Reset button
     analyzeBtn.innerHTML = originalText;

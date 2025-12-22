@@ -1,3 +1,4 @@
+# views.py
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -5,16 +6,14 @@ from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 import os
 import json
-from .ai_model import DiseaseDetector
+from .ai_model import DiseaseDetector 
 
 # Initialize the detector once when the module loads
 detector = DiseaseDetector()
 
-
 def disease_detection(request):
     """Render the disease detection page"""
-    return render(request, "Ai/disease_detection.html")
-
+    return render(request, "AI/disease_detection.html")  # Fixed template path
 
 @csrf_exempt
 def analyze_plant_image(request):
@@ -77,20 +76,21 @@ def analyze_plant_image(request):
             # Generate comprehensive report
             report = detector.generate_report(result)
             
-            # Prepare response data
+            # Prepare response data matching frontend expectations
             response_data = {
                 'success': True,
-                'plant': result['plant'],
-                'disease': result['disease'],
-                'is_healthy': result['is_healthy'],
-                'confidence': result['top_prediction']['confidence'],
-                'confidence_percentage': result['top_prediction']['percentage'],
-                'severity': report['severity'],
-                'predictions': result['predictions'],
-                'recommendations': report['recommendations'],
+                'plant': result.get('plant', 'Unknown'),
+                'disease': result.get('disease', 'Unknown'),
+                'is_healthy': result.get('is_healthy', True),
+                'confidence': result.get('top_prediction', {}).get('confidence', 0),
+                'confidence_percentage': result.get('top_prediction', {}).get('percentage', 0),
+                'severity': report.get('severity', 'Low'),
+                'predictions': result.get('predictions', []),
+                'recommendations': report.get('recommendations', {}),
                 'additional_info': result.get('additional_info', {})
             }
             
+            print(f"Response data: {json.dumps(response_data, indent=2)}")  # For debugging
             return JsonResponse(response_data)
             
         finally:
@@ -99,11 +99,13 @@ def analyze_plant_image(request):
                 default_storage.delete(file_name)
     
     except Exception as e:
+        import traceback
+        print(f"Error in analyze_plant_image: {str(e)}")
+        print(traceback.format_exc())
         return JsonResponse({
             'success': False,
             'error': f'Server error: {str(e)}'
         }, status=500)
-
 
 def get_plant_types(request):
     """
@@ -120,7 +122,6 @@ def get_plant_types(request):
             'success': False,
             'error': str(e)
         }, status=500)
-
 
 def get_diseases_for_plant(request, plant_type):
     """
