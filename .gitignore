@@ -63,4 +63,4 @@ htmlcov/
 # Ignore model training directory
 model_train/
 
-digitalkissan\logs
+digitalkissan/logs
