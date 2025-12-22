@@ -1555,13 +1555,13 @@ class DiseaseDetector:
                     'path': file_path
                 })
         
-        # Sort by modification time (newest first)
+        
         log_files.sort(key=lambda x: x['modified'], reverse=True)
         
         summary = {
             'log_directory': log_dir,
             'total_files': len(log_files),
-            'files': log_files[:10],  # Show last 10 files
+            'files': log_files[:10], 
             'current_log': log_file
         }
         
