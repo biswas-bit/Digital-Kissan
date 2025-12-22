@@ -2042,11 +2042,11 @@ body {
         <div class="card">
           <div class="card-content stats-content">
             <div class="stat-item">
-              <div class="stat-number">25,000+</div>
+              <div class="stat-number">35+</div>
               <div class="stat-label">Diseases Detected</div>
             </div>
             <div class="stat-item">
-              <div class="stat-number">98.5%</div>
+              <div class="stat-number">93%</div>
               <div class="stat-label">Accuracy Rate</div>
             </div>
           </div>
@@ -2210,8 +2210,8 @@ async function analyzeImage() {
     return;
   }
 
-  console.log("🚀 Starting analysis...");
-  console.log("📁 File info:", {
+  console.log("Starting analysis...");
+  console.log("File info:", {
     name: currentImageFile.name,
     size: currentImageFile.size,
     type: currentImageFile.type
@@ -2235,23 +2235,23 @@ async function analyzeImage() {
     formData.append('image', currentImageFile);
     
     // Log FormData contents
-    console.log("📦 FormData created");
+    console.log("FormData created");
     for (let pair of formData.entries()) {
       console.log(`  ${pair[0]}:`, pair[1]);
     }
 
     // Get CSRF token
     const csrfToken = getCookie('csrftoken');
-    console.log("🍪 CSRF Token:", csrfToken ? "Found" : "NOT FOUND");
+    console.log("CSRF Token:", csrfToken ? "Found" : "NOT FOUND");
     
     if (!csrfToken) {
-      console.error("❌ No CSRF token found!");
+      console.error("No CSRF token found!");
       console.log("Available cookies:", document.cookie);
       throw new Error('CSRF token not found. Please refresh the page.');
     }
 
     // Make API call with detailed logging
-    console.log("🌐 Making fetch request to /ai_detection/api/analyze/");
+    console.log("Making fetch request to /ai_detection/api/analyze/");
     
     const startTime = Date.now();
     
@@ -2266,31 +2266,31 @@ async function analyzeImage() {
       });
       
       const endTime = Date.now();
-      console.log(`⏱️ Request completed in ${endTime - startTime}ms`);
-      console.log("📊 Response status:", response.status, response.statusText);
-      console.log("📊 Response headers:");
+      console.log(` Request completed in ${endTime - startTime}ms`);
+      console.log(" Response status:", response.status, response.statusText);
+      console.log(" Response headers:");
       response.headers.forEach((value, key) => {
         console.log(`  ${key}: ${value}`);
       });
 
       // Check if response is JSON
       const contentType = response.headers.get('content-type');
-      console.log("📄 Content-Type:", contentType);
+      console.log(" Content-Type:", contentType);
       
       if (!response.ok) {
         let errorText = await response.text();
-        console.error("❌ Server error response:", errorText);
+        console.error(" Server error response:", errorText);
         throw new Error(`Server error: ${response.status} ${response.statusText}`);
       }
 
       if (!contentType || !contentType.includes('application/json')) {
         let text = await response.text();
-        console.error("❌ Response is not JSON:", text.substring(0, 200));
+        console.error(" Response is not JSON:", text.substring(0, 200));
         throw new Error('Server returned non-JSON response');
       }
 
       const data = await response.json();
-      console.log("✅ Response data received:", data);
+      console.log(" Response data received:", data);
 
       if (!data.success) {
         throw new Error(data.error || 'Analysis failed');
@@ -2312,7 +2312,7 @@ async function analyzeImage() {
       showToast("Analysis complete!", "success");
 
     } catch (fetchError) {
-      console.error("❌ Fetch error details:", {
+      console.error(" Fetch error details:", {
         name: fetchError.name,
         message: fetchError.message,
         stack: fetchError.stack
@@ -2321,7 +2321,7 @@ async function analyzeImage() {
     }
 
   } catch (error) {
-    console.error('💥 Analysis error:', error);
+    console.error(' Analysis error:', error);
     
     let errorMessage = error.message || 'Failed to analyze image';
     
@@ -2339,7 +2339,7 @@ async function analyzeImage() {
     showToast(errorMessage, 'error');
     
     // Additional debugging
-    console.log("🔍 Debug info:", {
+    console.log(" Debug info:", {
       currentPage: window.location.href,
       apiUrl: '/ai_detection/api/analyze/',
       csrfToken: getCookie('csrftoken') ? 'Present' : 'Missing',
