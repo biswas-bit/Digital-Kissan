@@ -515,6 +515,229 @@
   width: 100%;
 }
 
+/* Loading States */
+.loading-chart {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 8px;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--farmer-200);
+  border-top-color: var(--farmer-600);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+/* Status Indicators */
+.status-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.status-good {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.status-warning {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.status-critical {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+/* Data Table */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 16px;
+}
+
+.data-table th {
+  background: var(--farmer-50);
+  padding: 12px;
+  text-align: left;
+  font-weight: 600;
+  color: #4b5563;
+  border-bottom: 1px solid var(--farmer-200);
+}
+
+.data-table td {
+  padding: 12px;
+  border-bottom: 1px solid var(--farmer-200);
+}
+
+.data-table tr:hover {
+  background: var(--farmer-50);
+}
+
+/* Toast Notifications */
+.dashboard-toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 12px 24px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 9999;
+  animation: slideInRight 0.3s ease;
+  border-left: 4px solid var(--farmer-500);
+  max-width: 300px;
+}
+
+.dashboard-toast.toast-success {
+  border-left-color: var(--farmer-500);
+  background: var(--farmer-50);
+}
+
+.dashboard-toast.toast-error {
+  border-left-color: #ef4444;
+  background: #fef2f2;
+}
+
+.dashboard-toast.toast-warning {
+  border-left-color: #f59e0b;
+  background: #fffbeb;
+}
+
+.dashboard-toast.toast-info {
+  border-left-color: #3b82f6;
+  background: #eff6ff;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutRight {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+/* Dashboard Loading Overlay */
+.dashboard-loading {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.95);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  backdrop-filter: blur(5px);
+}
+
+.dashboard-loading .spinner {
+  width: 60px;
+  height: 60px;
+  border: 4px solid var(--farmer-200);
+  border-top-color: var(--farmer-600);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 16px;
+}
+
+.dashboard-loading p {
+  color: #4b5563;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+/* Debug Panel */
+.debug-panel {
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+  background: rgba(0, 0, 0, 0.9);
+  color: white;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-family: 'Courier New', monospace;
+  z-index: 1000;
+  max-width: 200px;
+  max-height: 150px;
+  overflow: auto;
+  display: none;
+}
+
+.debug-panel.visible {
+  display: block;
+}
+
+.debug-panel h4 {
+  margin: 0 0 8px 0;
+  color: #22c55e;
+  font-size: 12px;
+}
+
+.debug-info {
+  margin-bottom: 4px;
+}
+
+/* System Status Badge */
+.system-status {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  background: var(--farmer-100);
+  color: var(--farmer-700);
+}
+
+.system-status.online {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.system-status.offline {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+/* Last Update */
+.last-update {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  font-size: 11px;
+  color: #6b7280;
+}
+
 /* Responsive Design */
 @media (max-width: 1200px) {
   .dashboard-container {
@@ -544,181 +767,37 @@
   .crop-health-grid {
     grid-template-columns: 1fr;
   }
+  
+  .dashboard-filters {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .filter-btn {
+    width: 200px;
+  }
 }
 
-/* Loading Animation */
-.loading-chart {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 300px;
-}
-
-.loading-spinner {
-  width: 40px;
-  height: 40px;
-  border: 3px solid var(--farmer-200);
-  border-top-color: var(--farmer-600);
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
+/* Animations */
 @keyframes spin {
   to {
     transform: rotate(360deg);
   }
 }
 
-/* Tooltip Styles */
-.tooltip {
-  position: absolute;
-  background: rgba(0, 0, 0, 0.8);
-  color: white;
-  padding: 8px 12px;
-  border-radius: 6px;
-  font-size: 12px;
-  pointer-events: none;
-  z-index: 1000;
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-/* Chart Legends */
-.chart-legend {
-  display: flex;
-  gap: 16px;
-  margin-top: 16px;
-  flex-wrap: wrap;
-}
-
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 12px;
-  color: #6b7280;
-}
-
-.legend-color {
-  width: 12px;
-  height: 12px;
-  border-radius: 2px;
-}
-
-/* Status Indicators */
-.status-indicator {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 4px 8px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 500;
-}
-
-.status-good {
-  background: #dcfce7;
-  color: #166534;
-}
-
-.status-warning {
-  background: #fef3c7;
-  color: #92400e;
-}
-
-.status-critical {
-  background: #fee2e2;
-  color: #991b1b;
-}
-
-/* Progress Bars */
-.progress-bar {
-  height: 8px;
-  background: var(--farmer-200);
-  border-radius: 4px;
-  overflow: hidden;
-  margin: 8px 0;
-}
-
-.progress-fill {
-  height: 100%;
-  border-radius: 4px;
-  transition: width 0.3s ease;
-}
-
-.progress-good {
-  background: var(--farmer-500);
-}
-
-.progress-warning {
-  background: #f59e0b;
-}
-
-.progress-critical {
-  background: #ef4444;
-}
-
-/* Data Table */
-.data-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 16px;
-}
-
-.data-table th {
-  background: var(--farmer-50);
-  padding: 12px;
-  text-align: left;
-  font-weight: 600;
-  color: #4b5563;
-  border-bottom: 1px solid var(--farmer-200);
-}
-
-.data-table td {
-  padding: 12px;
-  border-bottom: 1px solid var(--farmer-200);
-}
-
-.data-table tr:hover {
-  background: var(--farmer-50);
-}
-
-/* Metric Cards */
-.metric-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 16px;
-  margin-top: 16px;
-}
-
-.metric-card {
-  background: white;
-  border-radius: 12px;
-  padding: 16px;
-  border: 1px solid var(--farmer-200);
-}
-
-.metric-card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-}
-
-.metric-card-title {
-  font-size: 14px;
-  color: #6b7280;
-}
-
-.metric-card-value {
-  font-size: 24px;
-  font-weight: 700;
-  color: #111827;
-}
-
-.metric-card-trend {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 12px;
+.kpi-card, .chart-card, .weather-widget, .soil-health-card {
+  animation: fadeIn 0.5s ease-out;
 }
 /* Reset and Base Styles */
 * {
@@ -1675,6 +1754,12 @@ body {
 {% endblock %}
 
 {% block content %}
+<!-- Dashboard Loading Overlay -->
+<div class="dashboard-loading" id="dashboardLoading">
+  <div class="spinner"></div>
+  <p>Loading Dashboard Data...</p>
+</div>
+
 <!-- Advanced Dashboard Header -->
 <header class="dashboard-header">
   <div class="header-gradient"></div>
@@ -1689,17 +1774,22 @@ body {
       <p>Real-time analytics, climate predictions, and field insights for smart farming decisions</p>
       
       <div class="dashboard-filters">
-        <button class="filter-btn active" data-period="today">Today</button>
-        <button class="filter-btn" data-period="week">This Week</button>
-        <button class="filter-btn" data-period="month">This Month</button>
-        <button class="filter-btn" data-period="season">This Season</button>
-        <select class="filter-btn" style="appearance: none; padding-right: 40px;">
-          <option>Select Field</option>
-          <option>North Field</option>
-          <option>South Field</option>
-          <option>East Field</option>
-          <option>West Field</option>
+        <button class="filter-btn active" data-period="today" onclick="loadDashboardData('today')">Today</button>
+        <button class="filter-btn" data-period="week" onclick="loadDashboardData('week')">This Week</button>
+        <button class="filter-btn" data-period="month" onclick="loadDashboardData('month')">This Month</button>
+        <button class="filter-btn" data-period="season" onclick="loadDashboardData('season')">This Season</button>
+        <select class="filter-btn" id="fieldSelect" onchange="loadFieldData(this.value)">
+          <option value="">Select Field</option>
+          <option value="North Field">North Field</option>
+          <option value="South Field">South Field</option>
+          <option value="East Field">East Field</option>
+          <option value="West Field">West Field</option>
         </select>
+      </div>
+      
+      <!-- System Status -->
+      <div class="system-status offline" id="systemStatus">
+        <span id="statusText">Connecting...</span>
       </div>
     </div>
   </div>
@@ -1710,8 +1800,8 @@ body {
     <div class="dashboard-container">
       <!-- Main Dashboard Grid -->
       <div class="dashboard-grid">
-        <!-- KPI Cards -->
-        <div class="kpi-card" style="grid-column: span 3;">
+        <!-- KPI Cards - Will be populated by JavaScript -->
+        <div class="kpi-card" style="grid-column: span 3;" id="kpi-moisture">
           <div class="kpi-header">
             <div class="kpi-title">Soil Moisture</div>
             <div class="kpi-icon">
@@ -1720,16 +1810,16 @@ body {
               </svg>
             </div>
           </div>
-          <div class="kpi-value">68%</div>
-          <div class="kpi-change positive">
+          <div class="kpi-value">--%</div>
+          <div class="kpi-change neutral">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="18 15 12 9 6 15"/>
+              <line x1="5" y1="12" x2="19" y2="12"/>
             </svg>
-            +2% from yesterday
+            Loading...
           </div>
         </div>
 
-        <div class="kpi-card" style="grid-column: span 3;">
+        <div class="kpi-card" style="grid-column: span 3;" id="kpi-health">
           <div class="kpi-header">
             <div class="kpi-title">Crop Health</div>
             <div class="kpi-icon">
@@ -1739,16 +1829,16 @@ body {
               </svg>
             </div>
           </div>
-          <div class="kpi-value">92%</div>
-          <div class="kpi-change positive">
+          <div class="kpi-value">--%</div>
+          <div class="kpi-change neutral">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="18 15 12 9 6 15"/>
+              <line x1="5" y1="12" x2="19" y2="12"/>
             </svg>
-            +5% this week
+            Loading...
           </div>
         </div>
 
-        <div class="kpi-card" style="grid-column: span 3;">
+        <div class="kpi-card" style="grid-column: span 3;" id="kpi-yield">
           <div class="kpi-header">
             <div class="kpi-title">Yield Prediction</div>
             <div class="kpi-icon">
@@ -1758,16 +1848,16 @@ body {
               </svg>
             </div>
           </div>
-          <div class="kpi-value">8.2T/ha</div>
-          <div class="kpi-change positive">
+          <div class="kpi-value">--T/ha</div>
+          <div class="kpi-change neutral">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="18 15 12 9 6 15"/>
+              <line x1="5" y1="12" x2="19" y2="12"/>
             </svg>
-            +12% vs target
+            Loading...
           </div>
         </div>
 
-        <div class="kpi-card" style="grid-column: span 3;">
+        <div class="kpi-card" style="grid-column: span 3;" id="kpi-water">
           <div class="kpi-header">
             <div class="kpi-title">Water Usage</div>
             <div class="kpi-icon">
@@ -1779,52 +1869,53 @@ body {
               </svg>
             </div>
           </div>
-          <div class="kpi-value">4,250L</div>
-          <div class="kpi-change negative">
+          <div class="kpi-value">--L</div>
+          <div class="kpi-change neutral">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="6 9 12 15 18 9"/>
+              <line x1="5" y1="12" x2="19" y2="12"/>
             </svg>
-            -15% efficiency
+            Loading...
           </div>
         </div>
 
         <!-- Weather Widget -->
-        <div class="weather-widget">
+        <div class="weather-widget" id="weatherWidget">
           <div class="weather-current">
             <div>
-              <div class="weather-temp">24°C</div>
-              <div class="weather-condition">Partly Cloudy</div>
+              <div class="weather-temp">--°C</div>
+              <div class="weather-condition">Loading...</div>
             </div>
             <div class="weather-details">
-              <div class="weather-location">North Field</div>
-              <div>Humidity: 65%</div>
-              <div>Wind: 12 km/h</div>
+              <div class="weather-location">Farm Location</div>
+              <div>Humidity: --%</div>
+              <div>Wind: -- km/h</div>
             </div>
           </div>
-          <div class="weather-forecast">
+          <div class="weather-forecast" id="weatherForecast">
+            <!-- Forecast will be populated by JavaScript -->
             <div class="forecast-day">
-              <div class="forecast-day-name">Mon</div>
-              <div class="forecast-day-temp">26°</div>
+              <div class="forecast-day-name">--</div>
+              <div class="forecast-day-temp">--°</div>
             </div>
             <div class="forecast-day">
-              <div class="forecast-day-name">Tue</div>
-              <div class="forecast-day-temp">28°</div>
+              <div class="forecast-day-name">--</div>
+              <div class="forecast-day-temp">--°</div>
             </div>
             <div class="forecast-day">
-              <div class="forecast-day-name">Wed</div>
-              <div class="forecast-day-temp">25°</div>
+              <div class="forecast-day-name">--</div>
+              <div class="forecast-day-temp">--°</div>
             </div>
           </div>
         </div>
 
         <!-- Soil Health Card -->
-        <div class="soil-health-card">
+        <div class="soil-health-card" id="soilHealthCard">
           <div class="chart-header">
             <div class="chart-title" style="color: white;">Soil Health Analysis</div>
           </div>
           <div class="soil-metrics">
             <div class="soil-metric">
-              <div class="metric-value">6.8</div>
+              <div class="metric-value" id="soilPh">--</div>
               <div class="metric-label">pH Level</div>
             </div>
             <div class="soil-metric">
@@ -1832,11 +1923,11 @@ body {
               <div class="metric-label">Organic Matter</div>
             </div>
             <div class="soil-metric">
-              <div class="metric-value">142 ppm</div>
+              <div class="metric-value" id="soilNitrogen">-- ppm</div>
               <div class="metric-label">Nitrogen</div>
             </div>
             <div class="soil-metric">
-              <div class="metric-value">45 ppm</div>
+              <div class="metric-value" id="soilPhosphorus">-- ppm</div>
               <div class="metric-label">Phosphorus</div>
             </div>
           </div>
@@ -1847,12 +1938,15 @@ body {
           <div class="chart-header">
             <div class="chart-title">Crop Health Distribution</div>
             <div class="chart-actions">
-              <button class="filter-btn">Weekly</button>
-              <button class="filter-btn active">Monthly</button>
+              <button class="filter-btn" onclick="updateChartPeriod('weekly')">Weekly</button>
+              <button class="filter-btn active" onclick="updateChartPeriod('monthly')">Monthly</button>
             </div>
           </div>
           <div class="chart-container">
             <canvas id="cropHealthChart"></canvas>
+            <div class="loading-chart" id="cropHealthLoading">
+              <div class="loading-spinner"></div>
+            </div>
           </div>
           <div class="chart-legend">
             <div class="legend-item">
@@ -1881,21 +1975,24 @@ body {
           </div>
           <div class="chart-container">
             <canvas id="temperatureChart"></canvas>
+            <div class="loading-chart" id="temperatureLoading">
+              <div class="loading-spinner"></div>
+            </div>
           </div>
           <div class="metric-cards">
             <div class="metric-card">
               <div class="metric-card-header">
                 <div class="metric-card-title">Avg Temp</div>
-                <span class="status-indicator status-good">Optimal</span>
+                <span class="status-indicator status-good" id="tempStatus">Optimal</span>
               </div>
-              <div class="metric-card-value">24.5°C</div>
+              <div class="metric-card-value" id="avgTemp">--°C</div>
             </div>
             <div class="metric-card">
               <div class="metric-card-header">
                 <div class="metric-card-title">Max Temp</div>
-                <span class="status-indicator status-warning">High</span>
+                <span class="status-indicator status-warning" id="maxTempStatus">--</span>
               </div>
-              <div class="metric-card-value">32°C</div>
+              <div class="metric-card-value" id="maxTemp">--°C</div>
             </div>
           </div>
         </div>
@@ -1907,9 +2004,12 @@ body {
           </div>
           <div class="chart-container">
             <canvas id="rainfallChart"></canvas>
+            <div class="loading-chart" id="rainfallLoading">
+              <div class="loading-spinner"></div>
+            </div>
           </div>
           <div class="data-table">
-            <table>
+            <table id="rainfallTable">
               <thead>
                 <tr>
                   <th>Day</th>
@@ -1918,24 +2018,10 @@ body {
                   <th>Status</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody id="rainfallTableBody">
+                <!-- Table rows will be populated by JavaScript -->
                 <tr>
-                  <td>Today</td>
-                  <td>2.4</td>
-                  <td>40%</td>
-                  <td><span class="status-indicator status-good">Light</span></td>
-                </tr>
-                <tr>
-                  <td>Tomorrow</td>
-                  <td>8.7</td>
-                  <td>75%</td>
-                  <td><span class="status-indicator status-warning">Moderate</span></td>
-                </tr>
-                <tr>
-                  <td>Day 3</td>
-                  <td>15.2</td>
-                  <td>90%</td>
-                  <td><span class="status-indicator status-critical">Heavy</span></td>
+                  <td colspan="4" style="text-align: center;">Loading rainfall data...</td>
                 </tr>
               </tbody>
             </table>
@@ -1949,34 +2035,24 @@ body {
           </div>
           <div class="chart-container">
             <canvas id="growthChart"></canvas>
+            <div class="loading-chart" id="growthLoading">
+              <div class="loading-spinner"></div>
+            </div>
           </div>
-          <div class="crop-health-grid">
+          <div class="crop-health-grid" id="cropHealthGrid">
+            <!-- Crop health items will be populated by JavaScript -->
             <div class="crop-health-item">
-              <div class="crop-health-percent">78%</div>
-              <div class="crop-health-label">Germination</div>
+              <div class="crop-health-percent">--%</div>
+              <div class="crop-health-label">Loading...</div>
               <div class="progress-bar">
-                <div class="progress-fill progress-good" style="width: 78%;"></div>
-              </div>
-            </div>
-            <div class="crop-health-item">
-              <div class="crop-health-percent">92%</div>
-              <div class="crop-health-label">Vegetative</div>
-              <div class="progress-bar">
-                <div class="progress-fill progress-good" style="width: 92%;"></div>
-              </div>
-            </div>
-            <div class="crop-health-item">
-              <div class="crop-health-percent">65%</div>
-              <div class="crop-health-label">Flowering</div>
-              <div class="progress-bar">
-                <div class="progress-fill progress-warning" style="width: 65%;"></div>
+                <div class="progress-fill progress-good" style="width: 0%;"></div>
               </div>
             </div>
           </div>
         </div>
 
         <!-- Alerts Card -->
-        <div class="alert-card">
+        <div class="alert-card" id="alertsCard">
           <div class="alert-header">
             <div class="alert-icon">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1987,30 +2063,14 @@ body {
             </div>
             <div class="alert-title">Active Alerts & Recommendations</div>
           </div>
-          <ul class="alert-list">
-            <li class="alert-item warning">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="10"/>
-                <line x1="12" y1="8" x2="12" y2="12"/>
-                <line x1="12" y1="16" x2="12.01" y2="16"/>
-              </svg>
-              <span>Irrigation required in South Field - Soil moisture at 42%</span>
-            </li>
+          <ul class="alert-list" id="alertsList">
             <li class="alert-item info">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <circle cx="12" cy="12" r="10"/>
                 <line x1="12" y1="16" x2="12" y2="12"/>
                 <line x1="12" y1="8" x2="12.01" y2="8"/>
               </svg>
-              <span>Optimal time for fertilizer application - Weather window: Next 48 hours</span>
-            </li>
-            <li class="alert-item severe">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
-                <line x1="12" y1="9" x2="12" y2="13"/>
-                <line x1="12" y1="17" x2="12.01" y2="17"/>
-              </svg>
-              <span>Heavy rainfall predicted (90% probability) in 3 days - Prepare drainage</span>
+              <span>Loading alerts...</span>
             </li>
           </ul>
         </div>
@@ -2028,6 +2088,11 @@ body {
               <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
               <path d="M3 9h18"/>
               <path d="M9 21V9"/>
+              <!-- Field labels -->
+              <text x="6" y="6" font-size="3" fill="var(--farmer-600)">North</text>
+              <text x="6" y="15" font-size="3" fill="var(--farmer-600)">South</text>
+              <text x="15" y="6" font-size="3" fill="var(--farmer-600)">East</text>
+              <text x="15" y="15" font-size="3" fill="var(--farmer-600)">West</text>
             </svg>
           </div>
           <div class="field-stats">
@@ -2048,7 +2113,7 @@ body {
             <div class="chart-title">Quick Actions</div>
           </div>
           <div class="quick-actions-list">
-            <a href="#" class="action-btn">
+            <a href="#" class="action-btn" onclick="triggerAction('irrigation')">
               <div class="action-icon">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
@@ -2057,7 +2122,7 @@ body {
               </div>
               <span>Schedule Irrigation</span>
             </a>
-            <a href="#" class="action-btn">
+            <a href="#" class="action-btn" onclick="triggerAction('soil_test')">
               <div class="action-icon">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
@@ -2065,7 +2130,7 @@ body {
               </div>
               <span>Soil Test Request</span>
             </a>
-            <a href="#" class="action-btn">
+            <a href="#" class="action-btn" onclick="triggerAction('generate_report')">
               <div class="action-icon">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <circle cx="12" cy="12" r="10"/>
@@ -2075,7 +2140,7 @@ body {
               </div>
               <span>Generate Report</span>
             </a>
-            <a href="#" class="action-btn">
+            <a href="#" class="action-btn" onclick="triggerAction('export_data')">
               <div class="action-icon">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
@@ -2094,24 +2159,13 @@ body {
             <div class="chart-title">Recent Activity</div>
           </div>
           <div class="data-table">
-            <table>
+            <table id="activityTable">
               <tbody>
                 <tr>
-                  <td>2 hours ago</td>
-                  <td>Irrigation started</td>
+                  <td>Just now</td>
+                  <td>Dashboard initialized</td>
                 </tr>
-                <tr>
-                  <td>4 hours ago</td>
-                  <td>Soil moisture check</td>
-                </tr>
-                <tr>
-                  <td>1 day ago</td>
-                  <td>Fertilizer applied</td>
-                </tr>
-                <tr>
-                  <td>2 days ago</td>
-                  <td>Pest inspection</td>
-                </tr>
+                <!-- More activities will be added by JavaScript -->
               </tbody>
             </table>
           </div>
@@ -2119,7 +2173,21 @@ body {
       </aside>
     </div>
   </div>
+  
+  <!-- Last Update Time -->
+  <div class="last-update" id="lastUpdate">
+    Last updated: <span id="lastUpdateTime">Never</span>
+  </div>
 </main>
+
+<!-- Debug Panel (Toggle with Ctrl+D) -->
+<div class="debug-panel" id="debugPanel">
+  <h4>Debug Information</h4>
+  <div class="debug-info">Status: <span id="debugStatus">Initializing...</span></div>
+  <div class="debug-info">API Calls: <span id="debugApiCalls">0</span></div>
+  <div class="debug-info">Data Age: <span id="debugDataAge">--</span></div>
+  <div class="debug-info">Chart Count: <span id="debugChartCount">0</span></div>
+</div>
 {% endblock %}
 
 {% block extra_js %}
@@ -2127,690 +2195,1245 @@ body {
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
+// =============================================================================
+// FARM MONITORING DASHBOARD - DYNAMIC DATA INTEGRATION
+// =============================================================================
+
+// Global state management
+let dashboardData = null;
+let chartInstances = {};
+let updateInterval = null;
+let isInitialized = false;
+let apiCallCount = 0;
+let lastUpdateTime = null;
+
+// Configuration
+const CONFIG = {
+    UPDATE_INTERVAL: 30000, // 30 seconds
+    CHART_ANIMATION_DURATION: 750,
+    API_TIMEOUT: 10000,
+    MAX_RETRIES: 3,
+    BASE_API_URL: '/farmmonitor/api/'
+};
+
+// =============================================================================
+// INITIALIZATION
+// =============================================================================
+
 document.addEventListener('DOMContentLoaded', function() {
-  // Initialize dashboard
-  initializeDashboard();
-  
-  // Set up filter buttons
-  setupFilters();
-  
-  // Initialize all charts
-  initializeCharts();
-  
-  // Set up real-time updates
-  setupRealTimeUpdates();
+    console.log('🌱 Initializing Farm Monitoring Dashboard...');
+    
+    // Initialize dashboard
+    initializeDashboard();
+    
+    // Set up keyboard shortcuts
+    setupKeyboardShortcuts();
+    
+    // Set up auto-refresh on tab focus
+    document.addEventListener('visibilitychange', function() {
+        if (!document.hidden && isInitialized) {
+            console.log('🔄 Tab focused, refreshing data...');
+            loadDashboardData('today');
+        }
+    });
 });
 
-function initializeDashboard() {
-  console.log('🚀 Farm Monitoring Dashboard Initialized');
-  
-  // Update time display
-  updateTimeDisplay();
-  setInterval(updateTimeDisplay, 60000); // Update every minute
-  
-  // Set up tooltips
-  setupTooltips();
-}
-
-function updateTimeDisplay() {
-  const now = new Date();
-  const timeString = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-  const dateString = now.toLocaleDateString('en-US', { 
-    weekday: 'long', 
-    year: 'numeric', 
-    month: 'long', 
-    day: 'numeric' 
-  });
-  
-  // Update any time/date displays if present
-  const timeElements = document.querySelectorAll('.current-time');
-  timeElements.forEach(el => {
-    el.textContent = `${dateString} • ${timeString}`;
-  });
-}
-
-function setupFilters() {
-  const filterBtns = document.querySelectorAll('.filter-btn');
-  const periodBtns = document.querySelectorAll('.filter-btn[data-period]');
-  
-  periodBtns.forEach(btn => {
-    btn.addEventListener('click', function() {
-      // Remove active class from all period buttons
-      periodBtns.forEach(b => b.classList.remove('active'));
-      
-      // Add active class to clicked button
-      this.classList.add('active');
-      
-      // Get selected period
-      const period = this.dataset.period;
-      
-      // Update charts based on period
-      updateChartsForPeriod(period);
-      
-      // Show loading state
-      showLoadingState();
-      
-      // Simulate data loading
-      setTimeout(() => {
-        updateDashboardData(period);
-        hideLoadingState();
-      }, 1000);
-    });
-  });
-  
-  // Quick action buttons
-  const actionBtns = document.querySelectorAll('.action-btn');
-  actionBtns.forEach(btn => {
-    btn.addEventListener('click', function(e) {
-      e.preventDefault();
-      const action = this.querySelector('span').textContent;
-      showToast(`Action triggered: ${action}`, 'success');
-    });
-  });
-}
-
-function updateChartsForPeriod(period) {
-  console.log(`Updating charts for period: ${period}`);
-  
-  // Update chart data based on period
-  const periods = {
-    today: { days: 1, label: 'Hourly' },
-    week: { days: 7, label: 'Daily' },
-    month: { days: 30, label: 'Weekly' },
-    season: { days: 90, label: 'Monthly' }
-  };
-  
-  const periodConfig = periods[period];
-  
-  // Update all charts with new data
-  updateChartData(cropHealthChart, periodConfig);
-  updateChartData(temperatureChart, periodConfig);
-  updateChartData(rainfallChart, periodConfig);
-  updateChartData(growthChart, periodConfig);
-}
-
-function showLoadingState() {
-  const charts = document.querySelectorAll('.chart-container');
-  charts.forEach(chart => {
-    const loadingDiv = document.createElement('div');
-    loadingDiv.className = 'loading-chart';
-    loadingDiv.innerHTML = '<div class="loading-spinner"></div>';
-    chart.appendChild(loadingDiv);
-  });
-}
-
-function hideLoadingState() {
-  const loadingDivs = document.querySelectorAll('.loading-chart');
-  loadingDivs.forEach(div => div.remove());
-}
-
-function updateDashboardData(period) {
-  // Simulate updating KPI cards with new data
-  const kpiCards = document.querySelectorAll('.kpi-card');
-  kpiCards.forEach(card => {
-    const valueElement = card.querySelector('.kpi-value');
-    const changeElement = card.querySelector('.kpi-change');
-    
-    if (valueElement && changeElement) {
-      // Generate random updated values (in real app, this would be from API)
-      const currentValue = parseFloat(valueElement.textContent.replace(/[^\d.]/g, ''));
-      const newValue = currentValue + (Math.random() * 5 - 2.5);
-      const changePercent = ((newValue - currentValue) / currentValue * 100).toFixed(1);
-      
-      // Update display
-      if (valueElement.textContent.includes('%')) {
-        valueElement.textContent = `${Math.max(0, Math.min(100, newValue)).toFixed(1)}%`;
-      } else if (valueElement.textContent.includes('°C')) {
-        valueElement.textContent = `${newValue.toFixed(1)}°C`;
-      } else if (valueElement.textContent.includes('T/ha')) {
-        valueElement.textContent = `${newValue.toFixed(1)}T/ha`;
-      } else {
-        valueElement.textContent = Math.round(newValue).toLocaleString();
-      }
-      
-      // Update change indicator
-      if (changePercent > 0) {
-        changeElement.className = 'kpi-change positive';
-        changeElement.innerHTML = `
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="18 15 12 9 6 15"/>
-          </svg>
-          +${Math.abs(changePercent)}% from previous
-        `;
-      } else if (changePercent < 0) {
-        changeElement.className = 'kpi-change negative';
-        changeElement.innerHTML = `
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="6 9 12 15 18 9"/>
-          </svg>
-          -${Math.abs(changePercent)}% from previous
-        `;
-      } else {
-        changeElement.className = 'kpi-change neutral';
-        changeElement.textContent = 'No change from previous';
-      }
+async function initializeDashboard() {
+    try {
+        showLoading(true);
+        updateDebugInfo('Initializing dashboard...');
+        
+        // Load initial data
+        await loadDashboardData('today');
+        
+        // Initialize all charts
+        initializeCharts();
+        
+        // Set up periodic updates
+        startPeriodicUpdates();
+        
+        // Mark as initialized
+        isInitialized = true;
+        
+        // Add initial activity
+        addActivity('Dashboard initialized');
+        
+        console.log('✅ Dashboard initialized successfully');
+        showToast('Dashboard ready!', 'success');
+        updateDebugInfo('Ready');
+        
+    } catch (error) {
+        console.error('❌ Dashboard initialization failed:', error);
+        showToast('Failed to initialize dashboard. Using fallback data.', 'error');
+        updateDebugInfo('Initialization failed');
+        
+        // Load fallback data
+        loadFallbackData();
+        
+    } finally {
+        showLoading(false);
+        updateSystemStatus('online');
     }
-  });
-  
-  // Update weather widget
-  updateWeatherWidget(period);
 }
 
-function updateWeatherWidget(period) {
-  const tempElement = document.querySelector('.weather-temp');
-  const forecastElements = document.querySelectorAll('.forecast-day-temp');
-  
-  if (tempElement) {
-    const currentTemp = parseFloat(tempElement.textContent.replace('°C', ''));
-    const newTemp = currentTemp + (Math.random() * 4 - 2);
-    tempElement.textContent = `${newTemp.toFixed(0)}°C`;
-  }
-  
-  forecastElements.forEach((element, index) => {
-    const currentTemp = parseFloat(element.textContent.replace('°', ''));
-    const newTemp = currentTemp + (Math.random() * 6 - 3);
-    element.textContent = `${newTemp.toFixed(0)}°`;
-  });
+// =============================================================================
+// DATA LOADING
+// =============================================================================
+
+async function loadDashboardData(period = 'today', retryCount = 0) {
+    if (retryCount > 0) {
+        console.log(`🔄 Retry attempt ${retryCount}...`);
+    }
+    
+    try {
+        updateDebugInfo(`Loading ${period} data...`);
+        apiCallCount++;
+        updateDebugInfo(`API Calls: ${apiCallCount}`);
+        
+        const response = await fetch(`${CONFIG.BASE_API_URL}dashboard-data/?period=${period}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        console.log('📊 API Response:', data);
+        
+        if (data.success) {
+            dashboardData = data.data;
+            lastUpdateTime = new Date();
+            
+            // Update all UI elements
+            updateDashboardUI();
+            updateChartsWithRealData();
+            
+            // Update period filter buttons
+            updateFilterButtons(period);
+            
+            // Update status
+            updateSystemStatus('online');
+            updateLastUpdateTime();
+            updateDebugInfo('Data loaded');
+            
+            // Show success notification
+            if (retryCount === 0) {
+                showToast(`Dashboard updated for ${period}`, 'success');
+            }
+            
+            // Add activity
+            addActivity(`Data updated for ${period}`);
+            
+            return true;
+            
+        } else {
+            throw new Error(data.error || 'Failed to load data');
+        }
+        
+    } catch (error) {
+        console.error('❌ Error loading dashboard data:', error);
+        
+        // Update status
+        updateSystemStatus('offline');
+        
+        // Retry logic
+        if (retryCount < CONFIG.MAX_RETRIES) {
+            showToast(`Retrying... (${retryCount + 1}/${CONFIG.MAX_RETRIES})`, 'warning');
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            return loadDashboardData(period, retryCount + 1);
+        }
+        
+        // Final failure - use fallback
+        showToast('Using offline data. API connection failed.', 'error');
+        updateDebugInfo('API failed, using fallback');
+        
+        // Load fallback data
+        loadFallbackData();
+        
+        return false;
+    }
 }
 
-function setupTooltips() {
-  // Add tooltips to chart elements
-  const chartElements = document.querySelectorAll('.chart-container');
-  
-  chartElements.forEach(chart => {
-    chart.addEventListener('mousemove', function(e) {
-      // In a real implementation, this would show data point details
-      // For now, we'll just demonstrate the concept
-      if (e.target.closest('canvas')) {
-        // Tooltip logic would go here
-      }
+function loadFallbackData() {
+    console.log('🔄 Loading fallback data...');
+    
+    // Generate realistic fallback data
+    dashboardData = {
+        weather: {
+            current_temp: 24 + Math.random() * 4 - 2,
+            humidity: 65 + Math.random() * 10 - 5,
+            condition: ['Clear', 'Partly Cloudy', 'Cloudy'][Math.floor(Math.random() * 3)],
+            wind_speed: 12 + Math.random() * 6 - 3,
+            forecast: [
+                { day: 'Mon', temp: 26, condition: 'Clear' },
+                { day: 'Tue', temp: 28, condition: 'Partly Cloudy' },
+                { day: 'Wed', temp: 25, condition: 'Cloudy' }
+            ],
+            location: 'Digital Kisan Farm'
+        },
+        soil: {
+            overall: {
+                moisture: 68 + Math.random() * 10 - 5,
+                temperature: 22.5 + Math.random() * 4 - 2,
+                ph_level: 6.8 + Math.random() * 0.4 - 0.2,
+                nitrogen: 152 + Math.random() * 20 - 10,
+                phosphorus: 42 + Math.random() * 10 - 5,
+                potassium: 185 + Math.random() * 30 - 15
+            },
+            by_field: {
+                'North Field': { moisture: 72, ph_level: 6.5, temperature: 21.8 },
+                'South Field': { moisture: 42, ph_level: 6.2, temperature: 23.1 },
+                'East Field': { moisture: 65, ph_level: 7.1, temperature: 22.3 },
+                'West Field': { moisture: 78, ph_level: 6.8, temperature: 21.5 }
+            }
+        },
+        crops: {
+            health_data: {
+                'Tomatoes': { health_score: 92 + Math.random() * 6 - 3, growth_stage: 'Flowering', stage_progress: 0.65 },
+                'Corn': { health_score: 85 + Math.random() * 6 - 3, growth_stage: 'Tasseling', stage_progress: 0.75 },
+                'Wheat': { health_score: 88 + Math.random() * 6 - 3, growth_stage: 'Heading', stage_progress: 0.8 },
+                'Potatoes': { health_score: 82 + Math.random() * 6 - 3, growth_stage: 'Tuber Bulking', stage_progress: 0.6 }
+            },
+            growth_progress: [
+                { week: 'Week 1', actual: 15, expected: 10 },
+                { week: 'Week 2', actual: 30, expected: 25 },
+                { week: 'Week 3', actual: 50, expected: 45 },
+                { week: 'Week 4', actual: 65, expected: 60 },
+                { week: 'Week 5', actual: 78, expected: 75 },
+                { week: 'Week 6', actual: 85, expected: 85 },
+                { week: 'Week 7', actual: 92, expected: 92 },
+                { week: 'Week 8', actual: 96, expected: 96 }
+            ]
+        },
+        rainfall: {
+            predictions: [
+                { day: 'Today', rainfall: 2.4, probability: 40, status: 'Light', status_class: 'good' },
+                { day: 'Tue', rainfall: 8.7, probability: 75, status: 'Moderate', status_class: 'warning' },
+                { day: 'Wed', rainfall: 15.2, probability: 90, status: 'Heavy', status_class: 'critical' },
+                { day: 'Thu', rainfall: 6.8, probability: 60, status: 'Moderate', status_class: 'warning' },
+                { day: 'Fri', rainfall: 3.2, probability: 35, status: 'Light', status_class: 'good' },
+                { day: 'Sat', rainfall: 1.5, probability: 20, status: 'Light', status_class: 'good' },
+                { day: 'Sun', rainfall: 0.8, probability: 10, status: 'Light', status_class: 'good' }
+            ]
+        },
+        kpis: {
+            soil_moisture: 68 + Math.random() * 10 - 5,
+            crop_health: 85 + Math.random() * 10 - 5,
+            yield_prediction: 8.2 + Math.random() * 1 - 0.5,
+            water_usage: 4250 + Math.random() * 500 - 250,
+            irrigation_efficiency: 85 + Math.random() * 10 - 5
+        },
+        alerts: [
+            {
+                type: 'info',
+                message: 'Using offline data - API connection unavailable',
+                icon: 'info',
+                priority: 'low'
+            }
+        ]
+    };
+    
+    // Update UI with fallback data
+    updateDashboardUI();
+    updateChartsWithRealData();
+    updateLastUpdateTime();
+    addActivity('Loaded fallback data (offline mode)');
+}
+
+// =============================================================================
+// UI UPDATE FUNCTIONS
+// =============================================================================
+
+function updateDashboardUI() {
+    if (!dashboardData) return;
+    
+    updateKPIs();
+    updateWeatherWidget();
+    updateSoilHealthCard();
+    updateAlerts();
+    updateCropHealthGrid();
+    updateRainfallTable();
+    updateTemperatureMetrics();
+}
+
+function updateKPIs() {
+    if (!dashboardData.kpis) return;
+    
+    const kpis = dashboardData.kpis;
+    
+    // Soil Moisture KPI
+    updateKPI('kpi-moisture', {
+        value: `${Math.round(kpis.soil_moisture || 0)}%`,
+        change: calculateRandomChange(-2, 5),
+        changeText: 'from yesterday'
     });
-  });
+    
+    // Crop Health KPI
+    updateKPI('kpi-health', {
+        value: `${Math.round(kpis.crop_health || 0)}%`,
+        change: calculateRandomChange(-3, 7),
+        changeText: 'this week'
+    });
+    
+    // Yield Prediction KPI
+    updateKPI('kpi-yield', {
+        value: `${(kpis.yield_prediction || 0).toFixed(1)}T/ha`,
+        change: calculateRandomChange(-5, 15),
+        changeText: 'vs target'
+    });
+    
+    // Water Usage KPI
+    const waterChange = calculateRandomChange(-20, -5);
+    updateKPI('kpi-water', {
+        value: `${Math.round(kpis.water_usage || 0).toLocaleString()}L`,
+        change: waterChange,
+        changeText: waterChange > 0 ? 'increase' : 'efficiency'
+    });
 }
 
-// Chart instances
-let cropHealthChart, temperatureChart, rainfallChart, growthChart;
+function updateKPI(elementId, data) {
+    const element = document.getElementById(elementId);
+    if (!element) return;
+    
+    const valueEl = element.querySelector('.kpi-value');
+    const changeEl = element.querySelector('.kpi-change');
+    
+    if (valueEl) {
+        animateValue(valueEl, data.value);
+    }
+    
+    if (changeEl) {
+        const isPositive = data.change > 0;
+        const isNegative = data.change < 0;
+        
+        changeEl.className = 'kpi-change';
+        if (isPositive) changeEl.classList.add('positive');
+        else if (isNegative) changeEl.classList.add('negative');
+        else changeEl.classList.add('neutral');
+        
+        const arrowSvg = isPositive ? 
+            '<polyline points="18 15 12 9 6 15"/>' :
+            isNegative ? 
+            '<polyline points="6 9 12 15 18 9"/>' :
+            '<line x1="5" y1="12" x2="19" y2="12"/>';
+        
+        changeEl.innerHTML = `
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                ${arrowSvg}
+            </svg>
+            ${Math.abs(data.change).toFixed(1)}% ${data.changeText}
+        `;
+    }
+}
+
+function calculateRandomChange(min, max) {
+    return parseFloat((Math.random() * (max - min) + min).toFixed(1));
+}
+
+function animateValue(element, newValue) {
+    const currentValue = element.textContent;
+    element.style.opacity = '0.5';
+    
+    setTimeout(() => {
+        element.textContent = newValue;
+        element.style.opacity = '1';
+    }, 150);
+}
+
+function updateWeatherWidget() {
+    if (!dashboardData.weather) return;
+    
+    const weather = dashboardData.weather;
+    
+    // Update current weather
+    const tempEl = document.querySelector('.weather-temp');
+    const conditionEl = document.querySelector('.weather-condition');
+    const locationEl = document.querySelector('.weather-location');
+    
+    if (tempEl) tempEl.textContent = `${Math.round(weather.current_temp || 0)}°C`;
+    if (conditionEl) conditionEl.textContent = weather.condition || 'Unknown';
+    if (locationEl) locationEl.textContent = weather.location || 'Farm Location';
+    
+    // Update weather details
+    const detailsEl = document.querySelector('.weather-details');
+    if (detailsEl) {
+        const existingLocation = detailsEl.querySelector('.weather-location');
+        detailsEl.innerHTML = '';
+        if (existingLocation) detailsEl.appendChild(existingLocation);
+        
+        detailsEl.innerHTML += `
+            <div>Humidity: ${Math.round(weather.humidity || 0)}%</div>
+            <div>Wind: ${(weather.wind_speed || 0).toFixed(1)} km/h</div>
+        `;
+    }
+    
+    // Update forecast
+    const forecastContainer = document.getElementById('weatherForecast');
+    if (forecastContainer && weather.forecast) {
+        forecastContainer.innerHTML = weather.forecast.slice(0, 3).map(day => `
+            <div class="forecast-day">
+                <div class="forecast-day-name">${day.day || '--'}</div>
+                <div class="forecast-day-temp">${day.temp || '--'}°</div>
+            </div>
+        `).join('');
+    }
+}
+
+function updateSoilHealthCard() {
+    if (!dashboardData.soil || !dashboardData.soil.overall) return;
+    
+    const soil = dashboardData.soil.overall;
+    
+    // Update pH
+    const phEl = document.getElementById('soilPh');
+    if (phEl && soil.ph_level !== undefined) {
+        phEl.textContent = soil.ph_level.toFixed(1);
+    }
+    
+    // Update nitrogen
+    const nitrogenEl = document.getElementById('soilNitrogen');
+    if (nitrogenEl && soil.nitrogen !== undefined) {
+        nitrogenEl.textContent = `${Math.round(soil.nitrogen)} ppm`;
+    }
+    
+    // Update phosphorus
+    const phosphorusEl = document.getElementById('soilPhosphorus');
+    if (phosphorusEl && soil.phosphorus !== undefined) {
+        phosphorusEl.textContent = `${Math.round(soil.phosphorus)} ppm`;
+    }
+}
+
+function updateAlerts() {
+    if (!dashboardData.alerts) return;
+    
+    const alerts = dashboardData.alerts;
+    const alertList = document.getElementById('alertsList');
+    
+    if (!alertList) return;
+    
+    if (alerts.length === 0) {
+        alertList.innerHTML = `
+            <li class="alert-item info">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="16" x2="12" y2="12"/>
+                    <line x1="12" y1="8" x2="12.01" y2="8"/>
+                </svg>
+                <span>No active alerts. All systems operating normally.</span>
+            </li>
+        `;
+        return;
+    }
+    
+    alertList.innerHTML = alerts.map(alert => {
+        const typeClass = alert.type === 'critical' ? 'severe' : 
+                         alert.type === 'warning' ? 'warning' : 'info';
+        
+        const iconSvg = alert.type === 'critical' ? 
+            '<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>' :
+            alert.type === 'warning' ?
+            '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>' :
+            '<circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>';
+        
+        return `
+            <li class="alert-item ${typeClass}">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    ${iconSvg}
+                </svg>
+                <span>${alert.message || 'Unknown alert'}</span>
+            </li>
+        `;
+    }).join('');
+}
+
+function updateCropHealthGrid() {
+    if (!dashboardData.crops || !dashboardData.crops.health_data) return;
+    
+    const healthData = dashboardData.crops.health_data;
+    const cropHealthGrid = document.getElementById('cropHealthGrid');
+    
+    if (!cropHealthGrid) return;
+    
+    const crops = ['Tomatoes', 'Corn', 'Wheat', 'Potatoes'];
+    
+    cropHealthGrid.innerHTML = crops.map(crop => {
+        const data = healthData[crop] || { health_score: 0, growth_stage: 'Unknown' };
+        const healthScore = Math.round(data.health_score || 0);
+        const progressClass = healthScore >= 70 ? 'progress-good' : 
+                             healthScore >= 50 ? 'progress-warning' : 'progress-critical';
+        
+        return `
+            <div class="crop-health-item">
+                <div class="crop-health-percent">${healthScore}%</div>
+                <div class="crop-health-label">${crop}</div>
+                <div class="progress-bar">
+                    <div class="progress-fill ${progressClass}" style="width: ${healthScore}%;"></div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function updateRainfallTable() {
+    if (!dashboardData.rainfall || !dashboardData.rainfall.predictions) return;
+    
+    const predictions = dashboardData.rainfall.predictions;
+    const tableBody = document.getElementById('rainfallTableBody');
+    
+    if (!tableBody) return;
+    
+    if (predictions.length === 0) {
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="4" style="text-align: center;">No rainfall predictions available</td>
+            </tr>
+        `;
+        return;
+    }
+    
+    tableBody.innerHTML = predictions.slice(0, 7).map(pred => {
+        const statusClass = pred.status_class || 'good';
+        return `
+            <tr>
+                <td>${pred.day || '--'}</td>
+                <td>${pred.rainfall || '--'}</td>
+                <td>${pred.probability || '--'}%</td>
+                <td><span class="status-indicator status-${statusClass}">${pred.status || 'Unknown'}</span></td>
+            </tr>
+        `;
+    }).join('');
+}
+
+function updateTemperatureMetrics() {
+    if (!dashboardData.weather) return;
+    
+    const weather = dashboardData.weather;
+    const currentTemp = weather.current_temp || 24;
+    
+    // Update average temp
+    const avgTempEl = document.getElementById('avgTemp');
+    if (avgTempEl) {
+        avgTempEl.textContent = `${currentTemp.toFixed(1)}°C`;
+    }
+    
+    // Update max temp (simulate by adding some variation)
+    const maxTemp = currentTemp + 5 + Math.random() * 3;
+    const maxTempEl = document.getElementById('maxTemp');
+    if (maxTempEl) {
+        maxTempEl.textContent = `${maxTemp.toFixed(1)}°C`;
+    }
+    
+    // Update status indicators
+    const tempStatusEl = document.getElementById('tempStatus');
+    const maxTempStatusEl = document.getElementById('maxTempStatus');
+    
+    if (tempStatusEl) {
+        if (currentTemp >= 20 && currentTemp <= 28) {
+            tempStatusEl.className = 'status-indicator status-good';
+            tempStatusEl.textContent = 'Optimal';
+        } else if (currentTemp < 15 || currentTemp > 35) {
+            tempStatusEl.className = 'status-indicator status-critical';
+            tempStatusEl.textContent = 'Extreme';
+        } else {
+            tempStatusEl.className = 'status-indicator status-warning';
+            tempStatusEl.textContent = 'Caution';
+        }
+    }
+    
+    if (maxTempStatusEl) {
+        maxTempStatusEl.textContent = maxTemp > 32 ? 'High' : 'Normal';
+        maxTempStatusEl.className = maxTemp > 32 ? 
+            'status-indicator status-warning' : 
+            'status-indicator status-good';
+    }
+}
+
+// =============================================================================
+// CHART FUNCTIONS
+// =============================================================================
 
 function initializeCharts() {
-  // Initialize Crop Health Chart
-  const cropHealthCtx = document.getElementById('cropHealthChart').getContext('2d');
-  cropHealthChart = new Chart(cropHealthCtx, {
-    type: 'bar',
-    data: {
-      labels: ['North Field', 'South Field', 'East Field', 'West Field', 'Central Field'],
-      datasets: [{
-        label: 'Crop Health Index',
-        data: [92, 78, 85, 65, 88],
-        backgroundColor: [
-          'rgba(34, 197, 94, 0.8)',
-          'rgba(134, 239, 172, 0.8)',
-          'rgba(74, 222, 128, 0.8)',
-          'rgba(251, 191, 36, 0.8)',
-          'rgba(163, 230, 53, 0.8)'
-        ],
-        borderColor: [
-          'rgb(34, 197, 94)',
-          'rgb(134, 239, 172)',
-          'rgb(74, 222, 128)',
-          'rgb(251, 191, 36)',
-          'rgb(163, 230, 53)'
-        ],
-        borderWidth: 1,
-        borderRadius: 6
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          display: false
+    hideAllChartLoaders();
+    
+    // Initialize charts with empty data first
+    initCropHealthChart();
+    initTemperatureChart();
+    initRainfallChart();
+    initGrowthChart();
+    
+    updateDebugInfo(`Charts: ${Object.keys(chartInstances).length}`);
+}
+
+function hideAllChartLoaders() {
+    const loaders = document.querySelectorAll('.loading-chart');
+    loaders.forEach(loader => loader.style.display = 'none');
+}
+
+function initCropHealthChart() {
+    const canvas = document.getElementById('cropHealthChart');
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    
+    chartInstances.cropHealth = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Tomatoes', 'Corn', 'Wheat', 'Potatoes'],
+            datasets: [{
+                label: 'Health Score',
+                data: [85, 82, 88, 78],
+                backgroundColor: [
+                    'rgba(34, 197, 94, 0.8)',
+                    'rgba(34, 197, 94, 0.7)',
+                    'rgba(34, 197, 94, 0.6)',
+                    'rgba(34, 197, 94, 0.5)'
+                ],
+                borderColor: [
+                    'rgb(34, 197, 94)',
+                    'rgb(34, 197, 94)',
+                    'rgb(34, 197, 94)',
+                    'rgb(34, 197, 94)'
+                ],
+                borderWidth: 1,
+                borderRadius: 4
+            }]
         },
-        tooltip: {
-          callbacks: {
-            label: function(context) {
-              return `Health: ${context.raw}%`;
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `Health: ${context.parsed.y}%`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                    ticks: {
+                        callback: function(value) {
+                            return value + '%';
+                        }
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)'
+                    }
+                },
+                x: {
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)'
+                    }
+                }
+            },
+            animation: {
+                duration: CONFIG.CHART_ANIMATION_DURATION
             }
-          }
         }
-      },
-      scales: {
-        y: {
-          beginAtZero: true,
-          max: 100,
-          title: {
-            display: true,
-            text: 'Health Index (%)'
-          },
-          grid: {
-            color: 'rgba(0, 0, 0, 0.05)'
-          }
-        },
-        x: {
-          grid: {
-            display: false
-          }
-        }
-      }
-    }
-  });
-
-  // Initialize Temperature Chart
-  const temperatureCtx = document.getElementById('temperatureChart').getContext('2d');
-  temperatureChart = new Chart(temperatureCtx, {
-    type: 'line',
-    data: {
-      labels: ['6 AM', '9 AM', '12 PM', '3 PM', '6 PM', '9 PM'],
-      datasets: [{
-        label: 'Temperature',
-        data: [18, 22, 28, 32, 26, 20],
-        borderColor: 'rgb(239, 68, 68)',
-        backgroundColor: 'rgba(239, 68, 68, 0.1)',
-        borderWidth: 2,
-        tension: 0.4,
-        fill: true,
-        pointBackgroundColor: 'rgb(239, 68, 68)',
-        pointBorderColor: '#ffffff',
-        pointBorderWidth: 2,
-        pointRadius: 6,
-        pointHoverRadius: 8
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          display: false
-        }
-      },
-      scales: {
-        y: {
-          beginAtZero: false,
-          min: 15,
-          max: 35,
-          title: {
-            display: true,
-            text: 'Temperature (°C)'
-          },
-          grid: {
-            color: 'rgba(0, 0, 0, 0.05)'
-          }
-        },
-        x: {
-          grid: {
-            color: 'rgba(0, 0, 0, 0.05)'
-          }
-        }
-      }
-    }
-  });
-
-  // Initialize Rainfall Chart
-  const rainfallCtx = document.getElementById('rainfallChart').getContext('2d');
-  rainfallChart = new Chart(rainfallCtx, {
-    type: 'bar',
-    data: {
-      labels: ['Today', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6', 'Day 7'],
-      datasets: [
-        {
-          label: 'Predicted Rainfall',
-          data: [2.4, 8.7, 15.2, 6.8, 3.2, 1.5, 0.8],
-          backgroundColor: [
-            'rgba(59, 130, 246, 0.8)',
-            'rgba(59, 130, 246, 0.8)',
-            'rgba(239, 68, 68, 0.8)',
-            'rgba(59, 130, 246, 0.8)',
-            'rgba(59, 130, 246, 0.8)',
-            'rgba(59, 130, 246, 0.8)',
-            'rgba(59, 130, 246, 0.8)'
-          ],
-          borderColor: 'rgb(59, 130, 246)',
-          borderWidth: 1,
-          borderRadius: 4
-        },
-        {
-          label: 'Rain Probability',
-          data: [40, 75, 90, 60, 35, 20, 10],
-          type: 'line',
-          borderColor: 'rgb(245, 158, 11)',
-          backgroundColor: 'rgba(245, 158, 11, 0.1)',
-          borderWidth: 2,
-          tension: 0.4,
-          fill: false,
-          yAxisID: 'y1'
-        }
-      ]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          position: 'top',
-        }
-      },
-      scales: {
-        y: {
-          type: 'linear',
-          display: true,
-          position: 'left',
-          title: {
-            display: true,
-            text: 'Rainfall (mm)'
-          },
-          grid: {
-            color: 'rgba(0, 0, 0, 0.05)'
-          }
-        },
-        y1: {
-          type: 'linear',
-          display: true,
-          position: 'right',
-          title: {
-            display: true,
-            text: 'Probability (%)'
-          },
-          min: 0,
-          max: 100,
-          grid: {
-            drawOnChartArea: false
-          }
-        },
-        x: {
-          grid: {
-            color: 'rgba(0, 0, 0, 0.05)'
-          }
-        }
-      }
-    }
-  });
-
-  // Initialize Growth Chart
-  const growthCtx = document.getElementById('growthChart').getContext('2d');
-  growthChart = new Chart(growthCtx, {
-    type: 'line',
-    data: {
-      labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6', 'Week 7', 'Week 8'],
-      datasets: [
-        {
-          label: 'Actual Growth',
-          data: [10, 25, 45, 60, 75, 85, 92, 96],
-          borderColor: 'rgb(34, 197, 94)',
-          backgroundColor: 'rgba(34, 197, 94, 0.1)',
-          borderWidth: 3,
-          tension: 0.3,
-          fill: true
-        },
-        {
-          label: 'Expected Growth',
-          data: [15, 30, 50, 65, 80, 90, 95, 100],
-          borderColor: 'rgba(107, 114, 128, 0.5)',
-          borderWidth: 2,
-          borderDash: [5, 5],
-          fill: false,
-          pointRadius: 0
-        }
-      ]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          position: 'top',
-        }
-      },
-      scales: {
-        y: {
-          beginAtZero: true,
-          max: 100,
-          title: {
-            display: true,
-            text: 'Growth Progress (%)'
-          },
-          grid: {
-            color: 'rgba(0, 0, 0, 0.05)'
-          }
-        },
-        x: {
-          grid: {
-            color: 'rgba(0, 0, 0, 0.05)'
-          }
-        }
-      }
-    }
-  });
-}
-
-function updateChartData(chart, periodConfig) {
-  if (!chart) return;
-  
-  // Generate new data based on period
-  const newData = generateMockData(periodConfig.days, chart.config.type);
-  
-  // Update chart data
-  chart.data.datasets.forEach((dataset, index) => {
-    if (index === 0) {
-      dataset.data = newData;
-    }
-  });
-  
-  // Update labels if needed
-  if (periodConfig.label) {
-    chart.data.labels = generateLabels(periodConfig.days, periodConfig.label);
-  }
-  
-  chart.update();
-}
-
-function generateMockData(count, chartType) {
-  const data = [];
-  let value = 50; // Starting value
-  
-  for (let i = 0; i < count; i++) {
-    // Add some randomness
-    const change = (Math.random() * 10 - 5);
-    value = Math.max(0, Math.min(100, value + change));
-    
-    if (chartType === 'bar') {
-      // For bar charts, use more varied data
-      data.push(Math.round(Math.random() * 30 + 70));
-    } else {
-      // For line charts, use smoother data
-      data.push(Math.round(value));
-    }
-  }
-  
-  return data;
-}
-
-function generateLabels(count, type) {
-  const labels = [];
-  const now = new Date();
-  
-  for (let i = 0; i < count; i++) {
-    const date = new Date();
-    date.setDate(now.getDate() - (count - i - 1));
-    
-    if (type === 'Hourly') {
-      labels.push(`${i + 6}:00`);
-    } else if (type === 'Daily') {
-      labels.push(date.toLocaleDateString('en-US', { weekday: 'short' }));
-    } else if (type === 'Weekly') {
-      labels.push(`Week ${i + 1}`);
-    } else if (type === 'Monthly') {
-      labels.push(date.toLocaleDateString('en-US', { month: 'short' }));
-    }
-  }
-  
-  return labels;
-}
-
-function setupRealTimeUpdates() {
-  // Simulate real-time data updates
-  setInterval(() => {
-    // Update KPI values randomly
-    const kpiValues = document.querySelectorAll('.kpi-value');
-    kpiValues.forEach(valueElement => {
-      const currentValue = parseFloat(valueElement.textContent.replace(/[^\d.]/g, ''));
-      if (!isNaN(currentValue)) {
-        const change = (Math.random() * 0.5 - 0.25);
-        const newValue = Math.max(0, Math.min(100, currentValue + change));
-        
-        if (valueElement.textContent.includes('%')) {
-          valueElement.textContent = `${newValue.toFixed(1)}%`;
-        } else if (valueElement.textContent.includes('°C')) {
-          valueElement.textContent = `${newValue.toFixed(1)}°C`;
-        }
-      }
     });
-    
-    // Add new activity to recent activity
-    const activities = [
-      'Soil sensor updated',
-      'Weather data refreshed',
-      'Irrigation system checked',
-      'Crop health scan completed',
-      'Pest monitoring updated'
-    ];
-    
-    const randomActivity = activities[Math.floor(Math.random() * activities.length)];
-    addRecentActivity(randomActivity);
-    
-  }, 30000); // Update every 30 seconds
 }
 
-function addRecentActivity(activity) {
-  const activityTable = document.querySelector('.data-table tbody');
-  if (activityTable) {
+function initTemperatureChart() {
+    const canvas = document.getElementById('temperatureChart');
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    
+    // Generate time labels for last 7 days
+    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    
+    chartInstances.temperature = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: days,
+            datasets: [{
+                label: 'Temperature (°C)',
+                data: [22, 24, 26, 25, 23, 24, 25],
+                borderColor: 'rgba(239, 68, 68, 1)',
+                backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                borderWidth: 2,
+                tension: 0.4,
+                fill: true,
+                pointBackgroundColor: 'rgb(239, 68, 68)',
+                pointBorderColor: '#ffffff',
+                pointBorderWidth: 2,
+                pointRadius: 4,
+                pointHoverRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `Temp: ${context.parsed.y}°C`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    ticks: {
+                        callback: function(value) {
+                            return value + '°C';
+                        }
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)'
+                    }
+                },
+                x: {
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)'
+                    }
+                }
+            }
+        }
+    });
+}
+
+function initRainfallChart() {
+    const canvas = document.getElementById('rainfallChart');
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    
+    chartInstances.rainfall = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Today', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            datasets: [{
+                label: 'Rainfall (mm)',
+                data: [2.4, 8.7, 15.2, 5.1, 0, 3.2, 10.5],
+                backgroundColor: [
+                    'rgba(59, 130, 246, 0.7)',
+                    'rgba(59, 130, 246, 0.7)',
+                    'rgba(239, 68, 68, 0.7)',
+                    'rgba(245, 158, 11, 0.7)',
+                    'rgba(59, 130, 246, 0.7)',
+                    'rgba(59, 130, 246, 0.7)',
+                    'rgba(59, 130, 246, 0.7)'
+                ],
+                borderColor: [
+                    'rgb(59, 130, 246)',
+                    'rgb(59, 130, 246)',
+                    'rgb(239, 68, 68)',
+                    'rgb(245, 158, 11)',
+                    'rgb(59, 130, 246)',
+                    'rgb(59, 130, 246)',
+                    'rgb(59, 130, 246)'
+                ],
+                borderWidth: 1,
+                borderRadius: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `Rainfall: ${context.parsed.y}mm`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return value + 'mm';
+                        }
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)'
+                    }
+                },
+                x: {
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)'
+                    }
+                }
+            }
+        }
+    });
+}
+
+function initGrowthChart() {
+    const canvas = document.getElementById('growthChart');
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    
+    chartInstances.growth = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6', 'Week 7', 'Week 8'],
+            datasets: [
+                {
+                    label: 'Actual Growth',
+                    data: [15, 28, 45, 62, 78, 85, 92, 96],
+                    borderColor: 'rgba(34, 197, 94, 1)',
+                    backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                    borderWidth: 3,
+                    tension: 0.3,
+                    fill: true
+                },
+                {
+                    label: 'Expected Growth',
+                    data: [12, 25, 42, 60, 75, 85, 90, 95],
+                    borderColor: 'rgba(156, 163, 175, 0.5)',
+                    borderWidth: 2,
+                    borderDash: [5, 5],
+                    fill: false,
+                    pointRadius: 0
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'bottom',
+                    labels: {
+                        padding: 20,
+                        usePointStyle: true
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `${context.dataset.label}: ${context.parsed.y}%`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                    ticks: {
+                        callback: function(value) {
+                            return value + '%';
+                        }
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)'
+                    }
+                },
+                x: {
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)'
+                    }
+                }
+            },
+            interaction: {
+                intersect: false,
+                mode: 'index'
+            }
+        }
+    });
+}
+
+function updateChartsWithRealData() {
+    if (!dashboardData) return;
+    
+    hideAllChartLoaders();
+    
+    // Update crop health chart
+    if (chartInstances.cropHealth && dashboardData.crops?.health_data) {
+        const healthData = dashboardData.crops.health_data;
+        const labels = Object.keys(healthData);
+        const values = labels.map(crop => healthData[crop]?.health_score || 0);
+        
+        chartInstances.cropHealth.data.labels = labels;
+        chartInstances.cropHealth.data.datasets[0].data = values;
+        
+        // Update colors based on health scores
+        chartInstances.cropHealth.data.datasets[0].backgroundColor = values.map(score => {
+            if (score >= 90) return 'rgba(34, 197, 94, 0.8)';
+            if (score >= 70) return 'rgba(134, 239, 172, 0.8)';
+            if (score >= 50) return 'rgba(251, 191, 36, 0.8)';
+            return 'rgba(239, 68, 68, 0.8)';
+        });
+        
+        chartInstances.cropHealth.update();
+    }
+    
+    // Update temperature chart with new data
+    if (chartInstances.temperature) {
+        // Generate new temperature data with some variation
+        const newData = [];
+        for (let i = 0; i < 7; i++) {
+            const baseTemp = (dashboardData.weather?.current_temp || 24) + Math.sin(i * 0.9) * 3;
+            newData.push(baseTemp + Math.random() * 2 - 1);
+        }
+        chartInstances.temperature.data.datasets[0].data = newData;
+        chartInstances.temperature.update();
+    }
+    
+    // Update rainfall chart
+    if (chartInstances.rainfall && dashboardData.rainfall?.predictions) {
+        const predictions = dashboardData.rainfall.predictions;
+        chartInstances.rainfall.data.labels = predictions.map(p => p.day || 'Day');
+        chartInstances.rainfall.data.datasets[0].data = predictions.map(p => p.rainfall || 0);
+        
+        // Update colors based on rainfall amount
+        chartInstances.rainfall.data.datasets[0].backgroundColor = predictions.map(pred => {
+            const rainfall = pred.rainfall || 0;
+            if (rainfall < 2) return 'rgba(59, 130, 246, 0.7)';
+            if (rainfall < 10) return 'rgba(245, 158, 11, 0.7)';
+            return 'rgba(239, 68, 68, 0.7)';
+        });
+        
+        chartInstances.rainfall.update();
+    }
+    
+    // Update growth chart
+    if (chartInstances.growth && dashboardData.crops?.growth_progress) {
+        const progressData = dashboardData.crops.growth_progress;
+        chartInstances.growth.data.labels = progressData.map(p => p.week || 'Week');
+        chartInstances.growth.data.datasets[0].data = progressData.map(p => p.actual || 0);
+        chartInstances.growth.data.datasets[1].data = progressData.map(p => p.expected || 0);
+        chartInstances.growth.update();
+    }
+}
+
+function updateChartPeriod(period) {
+    // Update chart period buttons
+    const buttons = document.querySelectorAll('.chart-actions .filter-btn');
+    buttons.forEach(btn => btn.classList.remove('active'));
+    
+    const activeBtn = document.querySelector(`.chart-actions .filter-btn[onclick*="${period}"]`);
+    if (activeBtn) {
+        activeBtn.classList.add('active');
+    }
+    
+    showToast(`Chart view changed to ${period}`, 'info');
+}
+
+// =============================================================================
+// ACTION FUNCTIONS
+// =============================================================================
+
+async function triggerAction(action) {
+    try {
+        showLoading(true);
+        
+        const response = await fetch(`${CONFIG.BASE_API_URL}trigger-action/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCsrfToken()
+            },
+            body: JSON.stringify({ action: action })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showToast(data.message || 'Action completed successfully', 'success');
+            addActivity(`Action: ${action}`);
+            
+            // Refresh data after action
+            setTimeout(() => loadDashboardData('today'), 1000);
+        } else {
+            throw new Error(data.error || 'Action failed');
+        }
+        
+    } catch (error) {
+        console.error('❌ Error triggering action:', error);
+        showToast(`Action failed: ${error.message}`, 'error');
+        
+    } finally {
+        showLoading(false);
+    }
+}
+
+async function loadFieldData(fieldName) {
+    if (!fieldName || fieldName === '') return;
+    
+    try {
+        showLoading(true);
+        
+        const response = await fetch(`${CONFIG.BASE_API_URL}field-data/${encodeURIComponent(fieldName)}/`);
+        const data = await response.json();
+        
+        if (data.success) {
+            showToast(`Loaded data for ${fieldName}`, 'success');
+            
+            // Update weather location
+            const locationEl = document.querySelector('.weather-location');
+            if (locationEl) {
+                locationEl.textContent = fieldName;
+            }
+            
+            addActivity(`Selected field: ${fieldName}`);
+        }
+        
+    } catch (error) {
+        console.error('❌ Error loading field data:', error);
+        showToast('Error loading field data', 'error');
+        
+    } finally {
+        showLoading(false);
+    }
+}
+
+// =============================================================================
+// UTILITY FUNCTIONS
+// =============================================================================
+
+function updateFilterButtons(activePeriod) {
+    const buttons = document.querySelectorAll('.dashboard-filters .filter-btn[data-period]');
+    buttons.forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.dataset.period === activePeriod) {
+            btn.classList.add('active');
+        }
+    });
+}
+
+function updateSystemStatus(status) {
+    const statusEl = document.getElementById('systemStatus');
+    const statusText = document.getElementById('statusText');
+    
+    if (statusEl && statusText) {
+        statusEl.className = 'system-status';
+        statusEl.classList.add(status);
+        statusText.textContent = status === 'online' ? 'Online' : 'Offline';
+    }
+}
+
+function updateLastUpdateTime() {
+    const timeEl = document.getElementById('lastUpdateTime');
+    if (timeEl && lastUpdateTime) {
+        timeEl.textContent = lastUpdateTime.toLocaleTimeString([], { 
+            hour: '2-digit', 
+            minute: '2-digit',
+            second: '2-digit'
+        });
+    }
+}
+
+function addActivity(activity) {
+    const activityTable = document.getElementById('activityTable');
+    if (!activityTable) return;
+    
+    const tbody = activityTable.querySelector('tbody');
+    if (!tbody) return;
+    
     const now = new Date();
     const timeString = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
     
     const newRow = document.createElement('tr');
     newRow.innerHTML = `
-      <td>Just now</td>
-      <td>${activity}</td>
+        <td>${timeString}</td>
+        <td>${activity}</td>
     `;
     
-    // Add at the beginning
-    activityTable.insertBefore(newRow, activityTable.firstChild);
+    tbody.insertBefore(newRow, tbody.firstChild);
     
-    // Keep only last 4 activities
-    const rows = activityTable.querySelectorAll('tr');
-    if (rows.length > 4) {
-      rows[rows.length - 1].remove();
+    // Keep only last 5 activities
+    const rows = tbody.querySelectorAll('tr');
+    if (rows.length > 5) {
+        rows[rows.length - 1].remove();
     }
-  }
+}
+
+function showLoading(show) {
+    const loadingEl = document.getElementById('dashboardLoading');
+    if (loadingEl) {
+        loadingEl.style.display = show ? 'flex' : 'none';
+    }
 }
 
 function showToast(message, type = 'info') {
-  // Remove existing toasts
-  const existingToasts = document.querySelectorAll('.dashboard-toast');
-  existingToasts.forEach(toast => toast.remove());
-
-  const toast = document.createElement('div');
-  toast.className = `dashboard-toast toast-${type}`;
-  
-  const icons = {
-    success: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>',
-    error: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>',
-    warning: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>',
-    info: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>'
-  };
-  
-  toast.innerHTML = `${icons[type] || icons.info}<span>${message}</span>`;
-  
-  // Add toast styles if not already in CSS
-  if (!document.getElementById('dashboard-toast-styles')) {
-    const style = document.createElement('style');
-    style.id = 'dashboard-toast-styles';
-    style.textContent = `
-      .dashboard-toast {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        padding: 12px 20px;
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        font-size: 14px;
-        font-weight: 500;
-        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
-        z-index: 9999;
-        animation: slideInRight 0.3s ease-out;
-        background: white;
-        border: 1px solid var(--farmer-200);
-      }
-      .toast-success {
-        background: #dcfce7;
-        color: #166534;
-        border-color: #bbf7d0;
-      }
-      .toast-error {
-        background: #fee2e2;
-        color: #991b1b;
-        border-color: #fecaca;
-      }
-      .toast-warning {
-        background: #fef3c7;
-        color: #92400e;
-        border-color: #fde68a;
-      }
-      .toast-info {
-        background: #dbeafe;
-        color: #1e40af;
-        border-color: #bfdbfe;
-      }
-      @keyframes slideInRight {
-        from {
-          transform: translateX(400px);
-          opacity: 0;
-        }
-        to {
-          transform: translateX(0);
-          opacity: 1;
-        }
-      }
-    `;
-    document.head.appendChild(style);
-  }
-  
-  document.body.appendChild(toast);
-  
-  setTimeout(() => {
-    toast.style.animation = 'slideInRight 0.3s ease-out reverse';
-    setTimeout(() => toast.remove(), 300);
-  }, 3000);
+    // Remove any existing toasts
+    const existingToast = document.querySelector('.dashboard-toast');
+    if (existingToast) {
+        existingToast.remove();
+    }
+    
+    const toast = document.createElement('div');
+    toast.className = `dashboard-toast toast-${type}`;
+    toast.textContent = message;
+    
+    document.body.appendChild(toast);
+    
+    // Auto-remove after 3 seconds
+    setTimeout(() => {
+        toast.style.animation = 'slideOutRight 0.3s ease';
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
 }
 
-// Export dashboard data function
-function exportDashboardData() {
-  const data = {
-    timestamp: new Date().toISOString(),
-    kpis: {},
-    charts: {}
-  };
-  
-  // Collect KPI data
-  document.querySelectorAll('.kpi-card').forEach(card => {
-    const title = card.querySelector('.kpi-title').textContent;
-    const value = card.querySelector('.kpi-value').textContent;
-    data.kpis[title] = value;
-  });
-  
-  // Show export confirmation
-  showToast('Dashboard data exported successfully!', 'success');
-  
-  // In a real implementation, this would trigger a download
-  console.log('Exporting data:', data);
+function updateDebugInfo(message) {
+    const debugStatus = document.getElementById('debugStatus');
+    if (debugStatus) {
+        debugStatus.textContent = message;
+    }
+    
+    const debugApiCalls = document.getElementById('debugApiCalls');
+    if (debugApiCalls) {
+        debugApiCalls.textContent = apiCallCount;
+    }
+    
+    const debugChartCount = document.getElementById('debugChartCount');
+    if (debugChartCount) {
+        debugChartCount.textContent = Object.keys(chartInstances).length;
+    }
+    
+    const debugDataAge = document.getElementById('debugDataAge');
+    if (debugDataAge && lastUpdateTime) {
+        const age = Math.floor((new Date() - lastUpdateTime) / 1000);
+        debugDataAge.textContent = `${age}s ago`;
+    }
 }
 
-// Make export function available globally
-window.exportDashboardData = exportDashboardData;
+function setupKeyboardShortcuts() {
+    document.addEventListener('keydown', function(event) {
+        // Ctrl+D to toggle debug panel
+        if (event.ctrlKey && event.key === 'd') {
+            event.preventDefault();
+            const debugPanel = document.getElementById('debugPanel');
+            debugPanel.classList.toggle('visible');
+        }
+        
+        // R to refresh
+        if (event.key === 'r' && !event.ctrlKey) {
+            event.preventDefault();
+            loadDashboardData('today');
+        }
+        
+        // 1-4 for periods
+        if (event.key >= '1' && event.key <= '4') {
+            const periods = ['today', 'week', 'month', 'season'];
+            const periodIndex = parseInt(event.key) - 1;
+            if (periods[periodIndex]) {
+                loadDashboardData(periods[periodIndex]);
+            }
+        }
+    });
+}
 
-// Initialize dashboard on load
-window.addEventListener('load', initializeDashboard);
+function getCsrfToken() {
+    const name = 'csrftoken';
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+// =============================================================================
+// REAL-TIME UPDATES
+// =============================================================================
+
+function startPeriodicUpdates() {
+    // Clear existing interval
+    if (updateInterval) {
+        clearInterval(updateInterval);
+    }
+    
+    // Update dashboard every 30 seconds
+    updateInterval = setInterval(async () => {
+        if (!document.hidden && isInitialized) {
+            console.log('🔄 Periodic update...');
+            await loadDashboardData('today');
+        }
+    }, CONFIG.UPDATE_INTERVAL);
+}
+
+function stopPeriodicUpdates() {
+    if (updateInterval) {
+        clearInterval(updateInterval);
+        updateInterval = null;
+    }
+}
+
+// =============================================================================
+// CLEANUP
+// =============================================================================
+
+window.addEventListener('beforeunload', function() {
+    stopPeriodicUpdates();
+    
+    // Destroy all chart instances
+    Object.values(chartInstances).forEach(chart => {
+        if (chart && chart.destroy) {
+            chart.destroy();
+        }
+    });
+});
+
+// =============================================================================
+// DEBUG & EXPORT
+// =============================================================================
+
+window.dashboardDebug = {
+    getData: () => dashboardData,
+    reloadData: () => loadDashboardData('today'),
+    getCharts: () => chartInstances,
+    triggerAction: (action) => triggerAction(action),
+    getStats: () => ({
+        apiCalls: apiCallCount,
+        lastUpdate: lastUpdateTime,
+        charts: Object.keys(chartInstances).length,
+        initialized: isInitialized
+    }),
+    exportData: () => {
+        if (!dashboardData) {
+            showToast('No data to export', 'warning');
+            return;
+        }
+        
+        const dataStr = JSON.stringify(dashboardData, null, 2);
+        const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+        
+        const exportFileDefaultName = `farm-dashboard-${new Date().toISOString().split('T')[0]}.json`;
+        
+        const linkElement = document.createElement('a');
+        linkElement.setAttribute('href', dataUri);
+        linkElement.setAttribute('download', exportFileDefaultName);
+        linkElement.click();
+        
+        showToast('Dashboard data exported!', 'success');
+        addActivity('Exported dashboard data');
+    }
+};
+
+// Initialize on load
+console.log('🚀 Farm Monitoring Dashboard Ready!');
 </script>
 {% endblock %}
